@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Painel de Administração</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Painel de Administração</h1>
+        
+        <form method="POST" action="{{ url_for('admin') }}" class="mb-4">
+            <div class="form-group">
+                <input type="text" name="nome" class="form-control" placeholder="Nome da Entidade" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Adicionar Entidade</button>
+        </form>
+        
+        <h2>Entidades Cadastradas</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entidade in entidades %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>{{ entidade.nome }}</td>
+                        <td>{% if entidade.ativo %}Ativo{% else %}Inativo{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('home') }}" class="btn btn-link">Voltar para o Início</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        const socket = io();
+
+        // Escuta o evento de atualização e recarrega a página
+        socket.on('update_page', () => {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>
+
+
+<!-- <!doctype html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Painel de Administração</h1>
+    <form method="POST" action="{{ url_for('admin') }}">
+        <input type="text" name="nome" placeholder="Nome da Entidade" required>
+        <button type="submit">Adicionar Entidade</button>
+    </form>
+    
+    <h2>Entidades Cadastradas</h2>
+    <ul>
+        {% for entidade in entidades %}
+            <li>{{ entidade.nome }} - {% if entidade.ativo %}Ativo{% else %}Inativo{% endif %}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('home') }}">Voltar para o Início</a>
+</body>
+</html>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Entidade</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table> -->

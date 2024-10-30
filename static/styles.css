@@ -1,0 +1,22 @@
+.box {
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.inativo {
+    background-color: red;
+    color: white;
+}
+
+.ativo  {
+    background-color: green;
+    color: white;
+}
+
+.bnt-toggle {
+    border: none;
+    border-radius: 8px;
+}
