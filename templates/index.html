@@ -13,13 +13,15 @@
 <body>
 
     <!-- Barra de Navegação -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Bem-vindo, {{ session['username'] }}!</a>
-        <form class="form-inline" method="GET" action="{{ url_for('home') }}">
-            <input class="form-control mr-sm-2" type="search" name="filtro" placeholder="Filtrar entidades" value="{{ request.args.get('filtro', '') }}">
-            <button class="btn btn-outline-success" type="submit">Pesquisar</button>
-        </form>
-    </nav>
+    <div class="nav">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Bem-vindo, {{ session['username'] }}!</a>
+            <form class="form-inline" method="GET" action="{{ url_for('home') }}">
+                <input class="form-control mr-sm-2" type="search" name="filtro" placeholder="Filtrar entidades" value="{{ request.args.get('filtro', '') }}">
+                <button class="btn btn-outline-success" type="submit">Pesquisar</button>
+            </form>
+        </nav>
+    </div>
 
     <div class="container mt-4">
         
@@ -39,7 +41,7 @@
             </div>
         </div>
         <!-- Entidades Inativas -->
-        <h3>Entidades Inativas</h3>
+        <h3>Entidades Indisponíveis</h3>
         <div class="row" id="inativas-container">
             {% for entidade in entidades if not entidade.ativo %}
                 <div class="col-md-4">
@@ -64,7 +66,7 @@
         </div>
 
         <!-- Entidades Ativas em Tabela -->
-        <h3>Entidades Ativas</h3>
+        <h3>Entidades Disponiveis</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -96,20 +98,6 @@
         </table>
     </div>
 
-    <!--<script>/*
-        function toggleAtivo(entidadeId) {
-            fetch(`/toggle/${entidadeId}`, { method: 'POST' })
-            /*.then(response => response.json())*/
-
-            //card.style.display = 'block';
-            location.reload();  // Recarrega para refletir o estado atualizado
-            /*.catch(error => console.error('Erro:', error));*/
-        }
-
-        function fecharCard() {
-            document.getElementById('card-dinamico').style.display = 'none';
-        }
-    </script>-->
     <script type="text/javascript">
         function toggleAtivo(entidadeId, ativo) {
             // Verifica se a entidade está ativa antes de pegar o valor do select

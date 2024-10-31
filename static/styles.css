@@ -5,6 +5,19 @@
     color: #721c24;
     margin-top: 15px;
     margin-bottom: 10;
+    transition: all 0.5s ease;
+}
+.entidade-card.inativo:hover{
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.nav{
+    display: flex;
+    /* justify-content: top; */
+    align-items: center;
+    /* height: 10vh; */
+    margin-left: 35%;
 }
 
 .switch {

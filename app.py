@@ -53,32 +53,19 @@ def toggle(entidade_id):
         entidade.usuario = session.get('username', 'Desconhecido')
         entidade.data = datetime.now()
         db.session.commit()
-        
-        # Verifica se o usuário está inativando a entidade
-        if not entidade.ativo:
-            # Cria um novo registro de log
-            log = Log(
+
+        log = Log(
                 usuario=session['username'],
                 entidade=entidade.nome,
                 acesso = entidade.acesso,
                 data=datetime.now(),
-                ativo=False
-            )
-            db.session.add(log)
-            db.session.commit()
-
-    # return redirect(url_for('home'))    
-     # Dados para o card dinâmico
+                ativo= entidade.ativo if entidade else not entidade.ativo 
+        )
+        db.session.add(log)
+        db.session.commit()
+        
         data = {}
-        #     'status': 'success',
-        #     'id': entidade.id,
-        #     'ativo': entidade.ativo,
-        #     'nome': entidade.nome,
-        #     'tipo_acesso': 'Tipo Variável',  # Substitua conforme necessário
-        #     'usuario': session.get('username', 'Desconhecido'),
-        #     'horario': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        # }
-        # socketio.emit('update_page')  # Emite o evento de atualização
+
         socketio.emit('update_page')  # Emite o evento de atualização
         return jsonify(data)
 
@@ -116,6 +103,16 @@ def log():
     logs = Log.query.filter(
         Log.usuario.like(f'%{filtro}%')
     ).order_by(Log.data.desc()).all()
+
+    # Formate a data de cada entidade antes de passar ao template
+    for log in logs:
+        if log.data:  # Verifique se a data existe para evitar erros
+            log.data_formatada = log.data.strftime('%d/%m/%Y %H:%M:%S')
+        else:
+            log.data_formatada = 'Data não disponível'
+
+
+
     return render_template('log.html', logs=logs)
 
 @socketio.on('connect')
