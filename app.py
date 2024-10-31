@@ -31,6 +31,13 @@ def home():
         Entidade.nome.like(f'%{filtro}%')
     ).order_by(Entidade.ativo.asc()).all()
 
+    # Formate a data de cada entidade antes de passar ao template
+    for entidade in entidades:
+        if entidade.data:  # Verifique se a data existe para evitar erros
+            entidade.data_formatada = entidade.data.strftime('%d/%m/%Y %H:%M:%S')
+        else:
+            entidade.data_formatada = 'Data não disponível'
+
     return render_template('index.html', entidades=entidades)
 
 
