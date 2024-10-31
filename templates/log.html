@@ -9,13 +9,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Painel de Administração</h1>
+        <h1>Painel de visualização de log</h1>
         
-        <form method="POST" action="{{ url_for('admin') }}" class="mb-4">
+        <form method="GET" action="{{ url_for('log') }}" class="mb-4">
             <div class="form-group">
-                <input type="text" name="nome" class="form-control" placeholder="Nome da Entidade" required>
+                <input type="text" name="filtro" class="form-control" placeholder="Nome do Usuário" required value="{{ request.args.get('filtro', '') }}">
             </div>
-            <button type="submit" class="btn btn-primary">Adicionar Entidade</button>
+            <button type="submit" class="btn btn-primary">Pesquisar</button>
         </form>
         
         <h2>Entidades Cadastradas</h2>
@@ -23,22 +23,26 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Nome</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Usuário</th>
+                    <th scope="col">Entidade</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Ativo</th>
                 </tr>
             </thead>
             <tbody>
-                {% for entidade in entidades %}
+                {% for log in logs %}
                     <tr>
                         <th scope="row">{{ loop.index }}</th>
-                        <td>{{ entidade.nome }}</td>
-                        <td>{% if entidade.ativo %}Ativo{% else %}Inativo{% endif %}</td>
+                        <td>{{ log.usuario }}</td>
+                        <td>{{ log.entidade }}</td>
+                        <td>{{ log.data }}</td>
+                        <td>{% if log.ativo %}Ativo{% else %}Inativo{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <a href="{{ url_for('home') }}" class="btn btn-link">Voltar para o Início</a>
+        <a href="{{ url_for('admin') }}" class="btn btn-link">Voltar para o Início</a>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

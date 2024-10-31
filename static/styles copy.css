@@ -1,0 +1,73 @@
+.box {
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.inativo {
+    background-color: red;
+    color: white;
+}
+
+.ativo  {
+    background-color: green;
+    color: white;
+}
+
+.bnt-toggle {
+    border: none;
+    border-radius: 8px;
+}
+.switch.ios, .switch-on.ios, .switch-off.ios { 
+    border-radius: 20rem;
+ }
+  .switch.ios .switch-handle { 
+    border-radius: 20rem;
+ }
+ .switch__container {
+    position: relative;
+    display: inline-block;
+    width: 60px;  /* Reduzido pela metade */
+    height: 30px; /* Reduzido pela metade */
+    margin-left: 10px;
+}
+
+.switch {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch__slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 30px;
+}
+
+.switch__slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;  /* Reduzido pela metade */
+    width: 26px;   /* Reduzido pela metade */
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.switch:checked + .switch__slider {
+    background-color: #8ce196;
+}
+
+.switch:checked + .switch__slider:before {
+    transform: translateX(30px); /* Reduzido pela metade */
+}

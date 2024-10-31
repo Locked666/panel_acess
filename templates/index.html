@@ -1,41 +1,152 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Entidades</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/css/bootstrap-switch-button.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Bem-vindo, {{ session['username'] }}!</h1>
-    <form method="GET" action="{{ url_for('home') }}">
-        <input type="text" name="filtro" placeholder="Filtrar entidades" value="{{ request.args.get('filtro', '') }}">
-        <button type="submit">Buscar</button>
-    </form>
 
-    
-    {% for entidade in entidades %}
+    <!-- Barra de Navegação -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Bem-vindo, {{ session['username'] }}!</a>
+        <form class="form-inline" method="GET" action="{{ url_for('home') }}">
+            <input class="form-control mr-sm-2" type="search" name="filtro" placeholder="Filtrar entidades" value="{{ request.args.get('filtro', '') }}">
+            <button class="btn btn-outline-success" type="submit">Pesquisar</button>
+        </form>
+    </nav>
 
-        <div class="box {% if entidade.ativo %}ativo{% else %}inativo{% endif %}">
-            <span>{{ entidade.nome }}</span>
-            <form action="{{ url_for('toggle', entidade_id=entidade.id) }}" method="post">
-                <!-- <button type="submit">{{ 'Desativar' if entidade.ativo else 'Ativar' }}</button> -->
-                <button class="bnt-toggle" type="submit">{{ 'Disponível' if entidade.ativo else 'Indisponível' }}</button>
-                <!-- <i class="fas {% if entidade.ativo %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i> -->
-                <!-- <div class="switch__container">
-                    <input name="{{entidade.nome}}-" id="switch-shadow" class="switch switch--shadow" type="submit">
-                    <label for="switch-shadow"></label>
-                </div> -->
-
-            </form>
+    <div class="container mt-4">
+        
+        <!-- Card Dinâmico acima da tabela -->
+         <div id="card-dinamico" class="card mt-4" style="display: none;">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 id="titulo-entidade"></h3>
+                <label class="switch">
+                    <input type="checkbox" checked onclick="fecharCard()">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            <div class="card-body">
+                <p><strong>Tipo de Acesso:</strong> <span id="tipo-acesso"></span></p>
+                <p><strong>Usuário:</strong> <span id="nome-usuario"></span></p>
+                <p><strong>Acessado às:</strong> <span id="horario-acesso"></span></p>
+            </div>
         </div>
-    {% endfor %}
+        <!-- Entidades Inativas -->
+        <h3>Entidades Inativas</h3>
+        <div class="row" id="inativas-container">
+            {% for entidade in entidades if not entidade.ativo %}
+                <div class="col-md-4">
+                    <div class="card entidade-card inativo">
+                        <div class="card-header">
+                            <h5>{{ entidade.nome }}</h5>
+                            <form action="{{ url_for('toggle', entidade_id=entidade.id) }}" method="post">
+                                <label class="switch">
+                                    <input type="checkbox" name="ativo" {% if entidade.ativo %} checked {% endif %} onchange="toggleAtivo({{ entidade.id }});">
+                                    <span class="slider round"></span>
+                                </label>
+                            </form>
+                        </div>
+                        <div class="card-body">
+                            <p id="tipo-acesso">Tipo de Acesso: {{entidade.acesso}}</p>
+                            <p id="nome-usuario">Usuário: {{entidade.usuario}} </p>
+                            <p>Acessado às: {{entidade.data}} </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Entidades Ativas em Tabela -->
+        <h3>Entidades Ativas</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Entidade</th>
+                    <th>Acesso</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="ativas-container">
+                {% for entidade in entidades if entidade.ativo %}
+                    <tr>
+                        <td>{{ entidade.nome }}</td>
+                        <td>
+                            <select id="tool-{{ entidade.id }}" class="form-select" name="tool" aria-label="Default select example" style="width: 150px;">
+                                <option value="Team Viewer" selected>Team Viewer</option>
+                                <option value="QSConect">QSConect</option>
+                                <option value="AnyDesk">AnyDesk</option>
+                            </select>
+                        </td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" data-ativo="{{ 'true' if entidade.ativo else 'false' }}" {% if entidade.ativo %}checked{% endif %} onchange="toggleAtivo({{ entidade.id }}, {{ 'true' if entidade.ativo else 'false' }});">
+                                <span class="slider round"></span>
+                            </label>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!--<script>/*
+        function toggleAtivo(entidadeId) {
+            fetch(`/toggle/${entidadeId}`, { method: 'POST' })
+            /*.then(response => response.json())*/
+
+            //card.style.display = 'block';
+            location.reload();  // Recarrega para refletir o estado atualizado
+            /*.catch(error => console.error('Erro:', error));*/
+        }
+
+        function fecharCard() {
+            document.getElementById('card-dinamico').style.display = 'none';
+        }
+    </script>-->
+    <script type="text/javascript">
+        function toggleAtivo(entidadeId, ativo) {
+            // Verifica se a entidade está ativa antes de pegar o valor do select
+            var selectElement = ativo ? document.getElementById(`tool-${entidadeId}`) : null;
+            var selectedTool = selectElement ? selectElement.value : null;
+        
+            // Envia o ID da entidade e, se ativa, o valor do select para o backend via AJAX
+            $.ajax({
+                url: `/toggle/${entidadeId}`,
+                type: 'POST',
+                data: {
+                    tool: selectedTool,  // Passa o valor apenas se ativo, caso contrário, será null
+                    ativo: ativo
+                },
+                success: function(response) {
+                    console.log('Status atualizado com sucesso:', response);
+                },
+                error: function(error) {
+                    console.error('Erro ao atualizar o status:', error);
+                }
+            });
+        }
+        
+        function fecharCard() {
+            document.getElementById('card-dinamico').style.display = 'none';
+        }
+    </script>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="{{ url_for('static', filename='styles.css') }}"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/dist/bootstrap-switch-button.min.js"></script>
     <script type="text/javascript">
         const socket = io();
 
@@ -47,38 +158,3 @@
     
 </body>
 </html>
-<!--                                                                -->
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entidades</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        {% for entidade in entidades %}
-            <div class="box {% if entidade.ativo %}ativo{% else %}inativo{% endif %}">
-                <span>{{ entidade.nome }}</span>
-                <form action="{{ url_for('toggle', entidade_id=entidade.id) }}" method="post">
-                    <button type="submit">
-                        <i class="fas {% if entidade.ativo %}fa-toggle-on{% else %}fa-toggle-off{% endif %}"></i>
-                    </button>
-                </form>
-            </div>
-        {% endfor %}
-    </div>
-
-    <script type="text/javascript">
-        const socket = io();
-
-        // Escuta o evento de atualização e recarrega a página
-        socket.on('update_page', () => {
-            window.location.reload();
-        });
-    </script>
-</body>
-</html> -->

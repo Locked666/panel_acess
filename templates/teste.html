@@ -1,15 +1,50 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-br">
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card com Switch</title>
+    <link rel="stylesheet" href="teste.css">
 </head>
 <body>
-    <h1>Bem-vindo, {{ session['username'] }}!</h1>
-    <form method="GET" action="{{ url_for('home') }}">
-        <input type="text" name="filtro" placeholder="Filtrar entidades" value="{{ request.args.get('filtro', '') }}">
-        <button type="submit">Buscar</button>
-    </form>
+    {% for entidade in entidades %}
+    <div class="box {% if entidade.ativo %}ativo{% else %}inativo{% endif %}">
+        <div class="card">
+            <!-- Primeira linha: Título + Switch Button -->
+            <div class="card-header">
+                <h3 class="card-title">{{ entidade.nome }}</h3>
+                <label class="switch">
+                    <input 
+                        type="checkbox" 
+                        name="ativo"
+                        class="switch" 
+                        {% if entidade.ativo %} checked {% endif %} 
+                        onchange="this.form.submit();">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            
+            <!-- Segunda linha: Tipo de Acesso -->
+            <div class="card-info">
+                <span class="info-label">Tipo de Acesso:</span>
+                <span class="info-value">Tipo Variável</span>
+            </div>
+            
+            <!-- Terceira linha: Usuário -->
+            <div class="card-info">
+                <span class="info-label">Usuário:</span>
+                <span class="info-value">Nome do Usuário</span>
+            </div>
+            
+            <!-- Quarta linha: Acessado às -->
+            <div class="card-info">
+                <span class="info-label">Acessado às:</span>
+                <span class="info-value">Horário Variável</span>
+            </div>
+        </div>
 
-    
+    </div>
+    {% endfor %}
+</body>
+</html>
+
