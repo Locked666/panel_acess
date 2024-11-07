@@ -11,6 +11,7 @@ class Entidade(db.Model):
     usuario = db.Column(db.String(100))
     data = db.Column(db.DateTime)
     acesso = db.Column(db.String(100))
+    tipo = db.Column(db.String(100))
     ativo = db.Column(db.Boolean, default=True)
 
 

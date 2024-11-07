@@ -7,10 +7,16 @@
     margin-bottom: 10;
     transition: all 0.5s ease;
 }
-.entidade-card.inativo:hover{
+.entidade-card:hover{
     transform: scale(1.1);
     z-index: 1;
 }
+.row::selection(col-md-4):hover> :not(:hover){
+   filter: blur(5px);
+   opacity: 0.5;
+}
+
+
 
 .nav{
     display: flex;

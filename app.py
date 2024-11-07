@@ -37,8 +37,16 @@ def home():
             entidade.data_formatada = entidade.data.strftime('%d/%m/%Y %H:%M:%S')
         else:
             entidade.data_formatada = 'Data não disponível'
+    e_filter = Entidade.query.filter(Entidade.ativo == False).all()
 
-    return render_template('index.html', entidades=entidades)
+    if len(e_filter) == 0:
+        qt_inativo = 0
+    else :
+        qt_inativo = 1     
+
+    # print(f"{entidades.qt_inativo}" * 20)    
+
+    return render_template('index.html', entidades=entidades, qt = qt_inativo  )
 
 
 

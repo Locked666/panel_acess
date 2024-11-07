@@ -30,7 +30,7 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h3 id="titulo-entidade"></h3>
                 <label class="switch">
-                    <input type="checkbox" checked onclick="fecharCard()">
+                    <input type="checkbox"  onclick="fecharCard()">
                     <span class="slider round"></span>
                 </label>
             </div>
@@ -41,7 +41,7 @@
             </div>
         </div>
         <!-- Entidades Inativas -->
-        <h3>Entidades Indisponíveis</h3>
+        {% if  qt != 0 %} <h3>Entidades Indisponíveis</h3> {% else %} <h3></h3> {% endif %} 
         <div class="row" id="inativas-container">
             {% for entidade in entidades if not entidade.ativo %}
                 <div class="col-md-4">
@@ -50,7 +50,7 @@
                             <h5>{{ entidade.nome }}</h5>
                             <form action="{{ url_for('toggle', entidade_id=entidade.id) }}" method="post">
                                 <label class="switch">
-                                    <input type="checkbox" name="ativo" {% if entidade.ativo %} checked {% endif %} onchange="toggleAtivo({{ entidade.id }});">
+                                    <input type="checkbox" name="ativo" {% if not entidade.ativo %} checked {% endif %} onchange="toggleAtivo({{ entidade.id }});">
                                     <span class="slider round"></span>
                                 </label>
                             </form>
@@ -88,7 +88,7 @@
                         </td>
                         <td>
                             <label class="switch">
-                                <input type="checkbox" data-ativo="{{ 'true' if entidade.ativo else 'false' }}" {% if entidade.ativo %}checked{% endif %} onchange="toggleAtivo({{ entidade.id }}, {{ 'true' if entidade.ativo else 'false' }});">
+                                <input type="checkbox" data-ativo="{{ 'true' if entidade.ativo else 'false' }}" {% if not  entidade.ativo %}checked{% endif %} onchange="toggleAtivo({{ entidade.id }}, {{ 'true' if entidade.ativo else 'false' }});">
                                 <span class="slider round"></span>
                             </label>
                         </td>
