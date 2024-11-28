@@ -80,6 +80,112 @@ def toggle(entidade_id):
     return jsonify({'status': 'error', 'message': 'Entidade não encontrada'}), 404
 
 
+@app.route('/entidades', methods=['GET'])
+def get_entidades():
+    # Capturar os parâmetros da URL
+    id = request.args.get('id')
+    ativo = request.args.get('ativo')
+    acesso = request.args.get('acesso')
+    usuario = request.args.get('usuario')
+    nome = request.args.get('nome')
+
+    # Base da consulta
+    query = Entidade.query
+
+    # Aplicar filtros dinamicamente
+    if id:
+        query = query.filter_by(id=id)
+    if ativo:
+        ativo_bool = ativo.lower() == 'true'  # Converte string para booleano
+        query = query.filter_by(ativo=ativo_bool)
+    if acesso:
+        query = query.filter(Entidade.acesso.ilike(f"%{acesso}%"))
+    if usuario:
+        query = query.filter(Entidade.usuario.ilike(f"%{usuario}%"))
+
+    if nome:
+        query = query.filter(Entidade.nome.ilike(f"%{nome}%"))    
+
+    # Executar a consulta
+    entidades = query.all()
+
+    # Converter resultado para JSON
+    entidades_json = [
+        {
+            "id": entidade.id,
+            "nome": entidade.nome,
+            "ativo": entidade.ativo,
+            "acesso": entidade.acesso,
+            "usuario": entidade.usuario,
+            "data": entidade.data.strftime('%d/%m/%Y %H:%M:%S') if entidade.data else None
+        }
+        for entidade in entidades
+    ]
+
+    # Retornar resultado como JSON
+    return jsonify(entidades_json)
+
+
+
+@app.route('/attEntidades', methods=['POST'])
+def update_entidades_api():
+    # Capturar os parâmetros da URL
+    id = request.args.get('id')  # Usando POST para obter parâmetros
+    ativo = request.args.get('ativo')  # True ou False
+    acesso = request.args.get('acesso')  # Tipo de acesso
+    usuario = request.args.get('usuario')  # Usuário responsável pela alteração
+    nome = request.args.get('nome')  # Nome opcional
+
+    # Validação de ID
+    if not id:
+        return jsonify({'status': 'error', 'message': 'ID da entidade não fornecido'}), 400
+
+    entidade = Entidade.query.get(id)
+
+    if entidade:
+        # Atualizar entidade com as informações fornecidas
+        entidade.ativo = True if ativo.lower() == 'true' else False  # Converte para booleano
+        entidade.acesso = acesso if acesso else entidade.acesso  # Atualiza somente se enviado
+        entidade.usuario = usuario if usuario else entidade.usuario
+        entidade.data = datetime.now()
+
+        try:
+            db.session.commit()
+
+            # Criar registro de log
+            log = Log(
+                usuario=usuario,
+                entidade=entidade.nome,
+                acesso=entidade.acesso,
+                data=datetime.now(),
+                ativo=entidade.ativo
+            )
+            db.session.add(log)
+            db.session.commit()
+
+            # Dados da resposta em JSON para atualizar o front
+            data = {
+                'status': 'success',
+                'message': 'Entidade atualizada com sucesso.',
+                'entidade': {
+                    'id': entidade.id,
+                    'nome': entidade.nome,
+                    'ativo': entidade.ativo,
+                    'acesso': entidade.acesso,
+                    'usuario': entidade.usuario,
+                    'data': entidade.data.strftime('%d/%m/%Y %H:%M:%S')
+                }
+            }
+
+            socketio.emit('update_page', data)  # Emite evento para atualizar o front
+            return jsonify(data)
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'status': 'error', 'message': f'Erro ao atualizar entidade: {str(e)}'}), 500
+
+    return jsonify({'status': 'error', 'message': 'Entidade não encontrada'}), 404
+
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -126,6 +232,7 @@ def log():
 @socketio.on('connect')
 def on_connect():
     print(f"Usuário conectado: {session['username']}.")
+
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000,debug=True)
