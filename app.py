@@ -2,10 +2,11 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session,jsonify
 from flask_socketio import SocketIO, emit
 from datetime import datetime
+from functions import encrypt,decrypt
 from models import db, Entidade,Log
 
 app = Flask(__name__)
-app.secret_key = 'chave_secreta'
+app.secret_key = os.environ.get('APP_SECRET_KEY')
 socketio = SocketIO(app)
 
 # Definindo o caminho absoluto para o banco de dados
@@ -126,6 +127,21 @@ def get_entidades():
     return jsonify(entidades_json)
 
 
+@app.route('/CheckStatus', methods=['GET'])
+def check_status():
+    # Obtém usuário e senha dos parâmetros da requisição
+    username = request.args.get('username')
+    password = request.args.get('password')
+
+    USERNAME = os.environ.get('APP_USERNAME')
+    # PASSWORD = os.environ.get('APP_PASSWORD')
+    PASSWORD = 123
+
+    # Verifica se usuário e senha estão corretos
+    if username == USERNAME and decrypt(password,os.environ.get('APP_SECRET_KEY'),os.environ.get('APP_SECRET_SALT')) == PASSWORD:
+        return jsonify({'status': 'success', 'message': 'Credenciais corretas'})
+    else:
+        return jsonify({'status': 'error', 'message': 'Usuário ou senha incorretos'}), 401
 
 @app.route('/attEntidades', methods=['POST'])
 def update_entidades_api():
