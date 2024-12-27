@@ -34,13 +34,16 @@ if __name__ == "__main__":
     
    
     # Define a senha e um valor de sal
-    password = "minha_senha_segura"
+    # password = "minha_senha_segura"
+    password = 'gAAAAABnberWHeorFEh-xUGBO1pGxrdrZvlqe5AnRjcsJ0AQuwGtPUm5jAQQ8FPQk64cbbR3bnuBI5a6ZcLYb_UiC-BpG97Vq-vAbhejeOIuJG01MJWzVjplIu2v_B7B-vFHdwI120_O'
     salt = os.environ.get('APP_SECRET_SALT')  # Exemplo de salt
     # Encripta a senha
     encrypted = encrypt(password, key, salt)
     print("Senha encriptada:", encrypted)
     # Decripta a senha
-    decrypted = decrypt(encrypted, key, salt)
+    # decrypted = decrypt(encrypted, key, salt)
+    decrypted = decrypt(password, key, salt)
     print("Senha decriptada:", decrypted)
 
-    
+    # KEY =  generate_key()
+    # print(KEY)

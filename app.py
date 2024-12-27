@@ -13,6 +13,8 @@ socketio = SocketIO(app)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 DATABASE_PATH = os.path.join(BASE_DIR, 'database', 'database.db')
 os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)  # Garante que a pasta 'database/' exista
+USERNAME = os.environ.get('APP_USERNAME')
+PASSWORD = os.environ.get('APP_PASSWORD')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Evita avisos desnecessários
@@ -134,14 +136,14 @@ def check_status():
     password = request.args.get('password')
 
     USERNAME = os.environ.get('APP_USERNAME')
-    # PASSWORD = os.environ.get('APP_PASSWORD')
-    PASSWORD = 123
-
+    PASSWORD = os.environ.get('APP_PASSWORD')
+    # PASSWORD = '123'
+    d_password = decrypt(password,os.environ.get('APP_SECRET_KEY'), os.environ.get('APP_SECRET_SALT'))
     # Verifica se usuário e senha estão corretos
-    if username == USERNAME and decrypt(password,os.environ.get('APP_SECRET_KEY'),os.environ.get('APP_SECRET_SALT')) == PASSWORD:
+    if username == USERNAME and  d_password== PASSWORD:
         return jsonify({'status': 'success', 'message': 'Credenciais corretas'})
     else:
-        return jsonify({'status': 'error', 'message': 'Usuário ou senha incorretos'}), 401
+        return jsonify({'status': 'error', 'message': 'Usuário ou senha incorretos' }), 401
 
 @app.route('/attEntidades', methods=['POST'])
 def update_entidades_api():
@@ -151,7 +153,14 @@ def update_entidades_api():
     acesso = request.args.get('acesso')  # Tipo de acesso
     usuario = request.args.get('usuario')  # Usuário responsável pela alteração
     nome = request.args.get('nome')  # Nome opcional
+    username = request.args.get('username') # Usuário de Acesso
+    password = request.args.get('password') # senha de acesso
+    d_password = decrypt(password,os.environ.get('APP_SECRET_KEY'), os.environ.get('APP_SECRET_SALT'))
 
+    if username != USERNAME or  d_password != PASSWORD:
+        return jsonify({'status': 'error', 'message': 'Usuário ou senha incorretos' }), 401
+        
+        
     # Validação de ID
     if not id:
         return jsonify({'status': 'error', 'message': 'ID da entidade não fornecido'}), 400
