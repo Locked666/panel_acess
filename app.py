@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, session,js
 from flask_socketio import SocketIO, emit
 from datetime import datetime
 from functions import encrypt,decrypt
-from models import db, Entidade,Log
+from models import db, Entidade,Log, ConfigAcesso
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('APP_SECRET_KEY')
@@ -51,8 +51,41 @@ def home():
 
     return render_template('index.html', entidades=entidades, qt = qt_inativo  )
 
+@app.route('/cadastro_acesso', methods=['GET', 'POST'])
+def cadastro_acesso():
+    if request.method == 'POST':
+        entidade_id = request.form.get('entidade-id')
+        tipo_conexao = request.form.get('tipo_conexao')
+        id_conexao = request.form.get('id_conexao')
+        port_conexao = request.form.get('port_conexao')
+        usuario = request.form.get('usuario')
+        senha = request.form.get('senha')
+        ativo = request.form.get('ativo')
 
+        config_acesso = ConfigAcesso(
+            entidade=entidade_id,
+            tipo_conexao=tipo_conexao,
+            id_conexao=id_conexao,
+            port_conexao=port_conexao,
+            usuario=usuario,
+            senha=senha,
+            ativo=ativo
+        )
+        db.session.add(config_acesso)
+        db.session.commit()
 
+        return redirect(url_for('home'))
+
+    entidades = Entidade.query.all()
+    acessos = ConfigAcesso.query.all()
+    return render_template('cadastro_acesso.html', acessos=acessos, entidades=entidades)
+
+@app.route('/api/entidades', methods=['GET'])
+def autocomplete_entidades():
+    query = request.args.get('q', '')  # O parâmetro 'q' contém o texto digitado
+    entidades = Entidade.query.filter(Entidade.nome.like(f"%{query}%")).all()
+    results = [{"id": e.id, "nome": e.nome} for e in entidades]
+    return jsonify(results)
 
 @app.route('/toggle/<int:entidade_id>', methods=['POST'])
 def toggle(entidade_id):

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Acesso - Entidades</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-4">Cadastro de Acesso - Entidades</h2>
+
+        <!-- Formulário para Adicionar/Editar Acessos -->
+        <form id="form-acesso", method="POST", action="{{ url_for('cadastro_acesso') }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="entidade" class="form-label">Entidade</label>
+                    <input type="text" class="form-control" id="entidade" name="entidade" placeholder="Digite o nome da entidade">
+                    <input type="hidden" id="entidade-id" name="entidade-id"> <!-- Para armazenar o ID da entidade selecionada -->
+                </div>
+                <div class="col-md-4">
+                    <label for="tipo_conexao" class="form-label">Tipo de Conexão</label>
+                    <select id="tipo_conexao" name="tipo_conexao" class="form-select">
+                        <option value="1">TeamViewer</option>
+                        <option value="2">QSConnect</option>
+                        <option value="3">AnyDesk</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="id_conexao" class="form-label">ID da Conexão</label>
+                    <input type="text" class="form-control" id="id_conexao" name="id_conexao" placeholder="ID ou Código de Acesso">
+                </div>
+                <div class="col-md-4">
+                    <label for="port_conexao" class="form-label">Porta</label>
+                    <input type="text" class="form-control" id="port_conexao" name="port_conexao" placeholder="Porta">
+                </div>
+                <div class="col-md-4">
+                    <label for="usuario" class="form-label">Usuário</label>
+                    <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Usuário">
+                </div>
+                <div class="col-md-4">
+                    <label for="senha" class="form-label">Senha</label>
+                    <input type="password" class="form-control" id="senha" name="senha" placeholder="Senha">
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                <button type="reset" class="btn btn-secondary">Limpar</button>
+            </div>
+        </form>
+
+        <!-- Tabela de Listagem com Filtro -->
+        <div class="mt-5">
+            <h3>Listagem de Acessos</h3>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="search-filter" placeholder="Pesquisar..." aria-label="Pesquisar">
+                <button class="btn btn-outline-secondary" type="button" onclick="filterTable()">Filtrar</button>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Entidade</th>
+                        <th scope="col">Tipo de Conexão</th>
+                        <th scope="col">ID da Conexão</th>
+                        <th scope="col">Porta</th>
+                        <th scope="col">Usuário</th>
+                        <th scope="col">Ativo</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                    <tbody id="table-body">
+                        {% for acesso in acessos %}
+                        <tr>
+                            <th scope="row">{{ acesso.id }}</th>
+                            <td>{{ acesso.entidade_rel.nome }}</td> <!-- Nome da entidade relacionada -->
+                            <td>{{ acesso.tipo_conexao }}</td>
+                            <td>{{ acesso.id_conexao }}</td>
+                            <td>{{ acesso.port_conexao }}</td>
+                            <td>{{ acesso.usuario }}</td>
+                            <td>{{ 'Sim' if acesso.ativo else 'Não' }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning">Editar</button>
+                                <button class="btn btn-sm btn-danger">Excluir</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function filterTable() {
+            const filter = document.getElementById('search-filter').value.toLowerCase();
+            const rows = document.querySelectorAll('#table-body tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $("#entidade").autocomplete({
+                source: function (request, response) {
+                    // Faz uma requisição para o backend Flask
+                    $.ajax({
+                        url: "/api/entidades",
+                        data: { q: request.term }, // O texto digitado pelo usuário
+                        success: function (data) {
+                            // Formata os resultados para o autocomplete
+                            response(data.map(item => ({
+                                label: item.nome, // Nome exibido
+                                value: item.nome, // Valor no campo
+                                id: item.id      // ID para usar no formulário
+                            })));
+                        },
+                        error: function () {
+                            console.error("Erro ao buscar entidades.");
+                        }
+                    });
+                },
+                select: function (event, ui) {
+                    // Atualiza o campo oculto com o ID da entidade selecionada
+                    $("#entidade-id").val(ui.item.id);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

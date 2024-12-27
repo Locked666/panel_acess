@@ -21,3 +21,5 @@ function fecharCard() {
     document.getElementById('card-dinamico').style.display = 'none';
 }
 
+
+
