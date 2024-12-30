@@ -51,30 +51,70 @@ def home():
 
     return render_template('index.html', entidades=entidades, qt = qt_inativo  )
 
+# @app.route('/cadastro_acesso', methods=['GET', 'POST'])
+# def cadastro_acesso():
+#     if request.method == 'POST':
+#         entidade_id = request.form.get('entidade-id')
+#         tipo_conexao = request.form.get('tipo_conexao')
+#         id_conexao = request.form.get('id_conexao')
+#         port_conexao = request.form.get('port_conexao')
+#         usuario = request.form.get('usuario')
+#         senha = request.form.get('senha')
+#         ativo = request.form.get('ativo')
+
+#         config_acesso = ConfigAcesso(
+#             entidade=entidade_id,
+#             tipo_conexao=tipo_conexao,
+#             id_conexao=id_conexao,
+#             port_conexao=port_conexao,
+#             usuario=usuario,
+#             senha=senha,
+#             ativo=ativo
+#         )
+#         db.session.add(config_acesso)
+#         db.session.commit()
+
+#         # return redirect(url_for('home'))
+        
+
+#     entidades = Entidade.query.all()
+#     acessos = ConfigAcesso.query.all()
+#     return render_template('cadastro_acesso.html', acessos=acessos, entidades=entidades)
+
 @app.route('/cadastro_acesso', methods=['GET', 'POST'])
 def cadastro_acesso():
     if request.method == 'POST':
-        entidade_id = request.form.get('entidade-id')
-        tipo_conexao = request.form.get('tipo_conexao')
-        id_conexao = request.form.get('id_conexao')
-        port_conexao = request.form.get('port_conexao')
-        usuario = request.form.get('usuario')
-        senha = request.form.get('senha')
-        ativo = request.form.get('ativo')
+        data = request.json
+        d_password = encrypt(data['senha'],os.environ.get('APP_SECRET_KEY'), os.environ.get('APP_SECRET_SALT')) if data['senha'] else None
+        try:
+            # Obter a entidade associada
+            entidade = Entidade.query.get(data['entidade-id'])
+            if not entidade:
+                return jsonify({'status': 'error', 'message': 'Entidade não encontrada'}), 400
 
-        config_acesso = ConfigAcesso(
-            entidade=entidade_id,
-            tipo_conexao=tipo_conexao,
-            id_conexao=id_conexao,
-            port_conexao=port_conexao,
-            usuario=usuario,
-            senha=senha,
-            ativo=ativo
-        )
-        db.session.add(config_acesso)
-        db.session.commit()
+            # Criar um novo acesso
+            novo_acesso = ConfigAcesso(
+                entidade=data['entidade-id'],
+                tipo_conexao=data['tipo_conexao'],
+                id_conexao=data.get('id_conexao'),
+                port_conexao=data.get('port_conexao'),
+                usuario=data.get('usuario'),
+                # senha=data.get('senha'),
+                senha=d_password,
+                ativo=data.get('ativo', True)
+            )
+            db.session.add(novo_acesso)
+            db.session.commit()
 
-        return redirect(url_for('home'))
+            return jsonify({
+                'status': 'success',
+                'id': novo_acesso.id,
+                'entidade': entidade.nome
+            }), 201
+
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'status': 'error', 'message': str(e)}), 500    
 
     entidades = Entidade.query.all()
     acessos = ConfigAcesso.query.all()
@@ -122,8 +162,14 @@ def get_entidades():
     id = request.args.get('id')
     ativo = request.args.get('ativo')
     acesso = request.args.get('acesso')
+    username = request.args.get('username')
+    password = request.args.get('password')
+    d_password = decrypt(password,os.environ.get('APP_SECRET_KEY'), os.environ.get('APP_SECRET_SALT'))
     usuario = request.args.get('usuario')
     nome = request.args.get('nome')
+
+    if username != USERNAME or  d_password != PASSWORD:
+        return jsonify({'status': 'error', 'message': 'Usuário ou senha incorretos' }), 401
 
     # Base da consulta
     query = Entidade.query
@@ -286,6 +332,10 @@ def log():
 
 
     return render_template('log.html', logs=logs)
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('page_404.html'), 404
 
 @socketio.on('connect')
 def on_connect():

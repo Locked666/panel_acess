@@ -99,7 +99,7 @@
     </div>
 
     <script type="text/javascript">
-        function toggleAtivo(entidadeId, ativo) {
+       function toggleAtivo(entidadeId, ativo) {
             // Verifica se a entidade está ativa antes de pegar o valor do select
             var selectElement = ativo ? document.getElementById(`tool-${entidadeId}`) : null;
             var selectedTool = selectElement ? selectElement.value : null;
@@ -113,10 +113,11 @@
                     ativo: ativo
                 },
                 success: function(response) {
-                    console.log('Status atualizado com sucesso:', response);
+
+                    showToast('Status atualizado com sucesso:', response);
                 },
                 error: function(error) {
-                    console.error('Erro ao atualizar o status:', error);
+                    showToast('Erro ao atualizar o status:', error);
                 }
             });
         }
@@ -129,7 +130,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="{{ url_for('static', filename='styles.css') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
