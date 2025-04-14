@@ -1,0 +1,369 @@
+{
+    "type": "query results",
+    "query": "SELECT NOME, ATIVO AS STATUS, \nCASE \n    WHEN TIPO = 'Prefeitura Municipal' THEN 'P' \n    WHEN TIPO = 'Câmara Municipal' THEN 'C' \n    WHEN TIPO = 'RPPS' THEN 'RPPS' \n    WHEN TIPO = 'SAAE' THEN 'SAAE' \n    ELSE 'O' \nEND AS TIPO_ENTIDADE\nFROM ENTIDADES",
+    "columns": [
+        {
+            "displayName": "nome",
+            "name": "nome",
+            "database": null,
+            "table": "entidades",
+            "type": "VARCHAR"
+        },
+        {
+            "displayName": "STATUS",
+            "name": "ativo",
+            "database": null,
+            "table": "entidades",
+            "type": "VARCHAR"
+        },
+        {
+            "displayName": "TIPO_ENTIDADE",
+            "name": "TIPO_ENTIDADE",
+            "database": null,
+            "table": null,
+            "type": "VARCHAR"
+        }
+    ],
+    "rows": [
+        [
+            "PM CARACOL",
+            1,
+            "P"
+        ],
+        [
+            "PM CORGUINHO",
+            1,
+            "P"
+        ],
+        [
+            "PM FIGUEIRÃO",
+            1,
+            "P"
+        ],
+        [
+            "PM LADARIO",
+            1,
+            "P"
+        ],
+        [
+            "PM RIO NEGRO",
+            1,
+            "P"
+        ],
+        [
+            "PM ROCHEDO",
+            1,
+            "P"
+        ],
+        [
+            "PM TERENOS",
+            1,
+            "P"
+        ],
+        [
+            "PM BANDEIRANTES",
+            1,
+            "P"
+        ],
+        [
+            "CM CARACOL",
+            1,
+            "C"
+        ],
+        [
+            "CM FIGUEIRÃO",
+            1,
+            "C"
+        ],
+        [
+            "CM LADARIO",
+            1,
+            "C"
+        ],
+        [
+            "CM CORGUINHO",
+            1,
+            "C"
+        ],
+        [
+            "CM SELVIRIA",
+            1,
+            "C"
+        ],
+        [
+            "CM PEDRO GOMES",
+            1,
+            "C"
+        ],
+        [
+            "CM RIO NEGRO",
+            1,
+            "C"
+        ],
+        [
+            "CM TERENOS",
+            1,
+            "C"
+        ],
+        [
+            "CM BANDEIRANTES",
+            1,
+            "C"
+        ],
+        [
+            "CM MIRANDA",
+            1,
+            "C"
+        ],
+        [
+            "CM CORUMBA",
+            1,
+            "C"
+        ],
+        [
+            "QUALITY SISTEMAS",
+            1,
+            "O"
+        ],
+        [
+            "CM ROCHEDO",
+            1,
+            "C"
+        ],
+        [
+            "INST. DE APOS. E PENSÕES DOS SERVIDORES MUN. DE TERENOS",
+            1,
+            "RPPS"
+        ],
+        [
+            "PM ANTONIO JOÃO",
+            1,
+            "P"
+        ],
+        [
+            "CM ANTONIO JOAO",
+            1,
+            "C"
+        ],
+        [
+            "CM BODOQUENA",
+            1,
+            "C"
+        ],
+        [
+            "ESCOLA MUNICIPAL JOÃO JOSÉ LEITE",
+            1,
+            "O"
+        ],
+        [
+            "CENTRO DE EDUCAÇÃO INFANTIL CRIANÇA FELIZ",
+            1,
+            "O"
+        ],
+        [
+            "CM NIOAQUE",
+            1,
+            "C"
+        ],
+        [
+            "HOSPITAL MUNICIPAL RITA ANTONIA MACIEL GODOY",
+            1,
+            "O"
+        ],
+        [
+            "CM DOIS IRMAOS DO BURITI",
+            1,
+            "C"
+        ],
+        [
+            "SERVIÇO AUTÔNOMO DE ÁGUA E ESGOTO DE CORGUINHO",
+            1,
+            "SAAE"
+        ],
+        [
+            "CM RIO VERDE DE MATO GROSSO",
+            1,
+            "C"
+        ],
+        [
+            "CM APARECIDA DO TABOADO",
+            1,
+            "C"
+        ],
+        [
+            "CM GUIA LOPES DA LAGUNA",
+            1,
+            "C"
+        ],
+        [
+            "CM CAMAPUA",
+            1,
+            "C"
+        ],
+        [
+            "PM NIOAQUE",
+            1,
+            "P"
+        ],
+        [
+            "CM AGUA CLARA",
+            1,
+            "C"
+        ],
+        [
+            "PM PARAISO DAS AGUAS",
+            1,
+            "P"
+        ],
+        [
+            "INSTITUTO MUNICIPAL DE PREVIDENCIA SOCIAL DE ROCHEDO",
+            1,
+            "RPPS"
+        ],
+        [
+            "CM INOCENCIA",
+            1,
+            "C"
+        ],
+        [
+            "CM PARAISO DAS AGUAS",
+            1,
+            "C"
+        ],
+        [
+            "CM COTRIGUACU",
+            1,
+            "C"
+        ],
+        [
+            "SECRETARIA MUNICIPAL DE SAUDE RIO NEGRO",
+            1,
+            "O"
+        ],
+        [
+            "FUNDO MUNICIPAL SAÚDE DE RIO NEGRO",
+            1,
+            "O"
+        ],
+        [
+            "INSTITUTO MUNICIPAL DE PREVIDENCIA SOCIAL DE LADARIO",
+            1,
+            "RPPS"
+        ],
+        [
+            "CM NOVO HORIZONTE DO SUL",
+            1,
+            "C"
+        ],
+        [
+            "CM ARAL MOREIRA",
+            1,
+            "C"
+        ],
+        [
+            "CM NOVA ALVORADA DO SUL",
+            1,
+            "C"
+        ],
+        [
+            "CM ANGELICA",
+            1,
+            "C"
+        ],
+        [
+            "PM QUALITY SISTEMAS",
+            1,
+            "P"
+        ],
+        [
+            "SERVICO AUTONOMO DE AGUA E ESGOTO DE PARAISO DAS AGUAS-SAAE",
+            1,
+            "SAAE"
+        ],
+        [
+            "CM DEODAPOLIS",
+            1,
+            "C"
+        ],
+        [
+            "INST. MUN. DE PREV. SOCIAL DOS SERV. DE ANTONIO JOAO-IMPS",
+            1,
+            "RPPS"
+        ],
+        [
+            "PMCAMAPUA",
+            1,
+            "P"
+        ],
+        [
+            "CM JARDIM",
+            1,
+            "C"
+        ],
+        [
+            "CM PORTO MURTINHO",
+            1,
+            "C"
+        ],
+        [
+            "SERVICO AUTONOMO DE AGUA E ESGOTO DE BANDEIRANTES",
+            1,
+            "SAAE"
+        ],
+        [
+            "SECRETARIA MUNICIPAL DE SAUDE DE CARACOL",
+            1,
+            "O"
+        ],
+        [
+            "ESF LIDIANE DE OLIVEIRA GARDIN GALEANO",
+            1,
+            "O"
+        ],
+        [
+            "ESF CANDELARIA NUNES",
+            1,
+            "O"
+        ],
+        [
+            "ESF IRIA CONCEICAO ALVARENGA MENDES",
+            1,
+            "O"
+        ],
+        [
+            "PLENUS CONSULTORIA",
+            1,
+            "O"
+        ],
+        [
+            "HOSPITAL E MATERNIDADE IDIMAQUE PAES FERREIRA",
+            1,
+            "O"
+        ],
+        [
+            "PMNOVA ALVORADA DO SUL",
+            1,
+            "P"
+        ],
+        [
+            "CM BELA VISTA",
+            1,
+            "C"
+        ],
+        [
+            "PM INOCENCIA",
+            1,
+            "P"
+        ],
+        [
+            "PM MUNICIPAL PORTO MURTINHO",
+            1,
+            "P"
+        ],
+        [
+            "INST. DE PREV DOS SERV. PUBLICOS DO PMCAMAPUA",
+            1,
+            "RPPS"
+        ]
+    ]
+}

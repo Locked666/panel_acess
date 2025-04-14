@@ -1,0 +1,344 @@
+# Configurações para upload de arquivos
+UPLOAD_FOLDER = 'uploads/documentos_viagens'
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
+
+# @app.route('/adicionar_viagem', methods=['GET', 'POST'])
+# def adicionar_viagem():
+#     if request.method == 'GET':
+#         entidades = Entidade.query.filter_by(ativo=True).all()
+#         return render_template('adicionar_viagem.html', entidades=entidades)
+    
+#     if request.method == 'POST':
+#         # Verificar se é uma requisição AJAX para diferentes partes do formulário
+#         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#             data = request.get_json() if request.is_json else request.form
+#             action = data.get('action')
+#             if not action:
+#                     return jsonify({'status': 'error', 'message': 'Ação não especificada'}), 400
+            
+#             action = request.form.get('action')
+    
+#             if action == 'salvar_dados_principais':
+#                 return salvar_dados_principais(request)
+#             elif action == 'salvar_gasto':
+#                 return salvar_gasto(request)
+#             elif action == 'salvar_outros':
+#                 return salvar_outros(request)
+#             elif action == 'listar_gastos':
+#                 return listar_gastos(request)
+#             elif action == 'excluir_gasto':
+#                 return excluir_gasto(request)
+#             elif action == 'obter_gasto':
+#                 return obter_gasto(request)
+            
+#             # return jsonify({'status': 'error', 'message': 'Ação não reconhecida'}), 400    
+        
+#         # Processamento do formulário principal (não-AJAX)
+#         return processar_formulario_principal(request)
+@app.route('/adicionar_viagem', methods=['GET', 'POST'])
+def adicionar_viagem():
+    if request.method == 'GET':
+        entidades = Entidade.query.filter_by(ativo=True).all()
+        return render_template('adicionar_viagem.html', entidades=entidades)
+    
+    if request.method == 'POST':
+        try:
+            # Verifica se é AJAX
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Obter dados JSON
+                data = request.get_json()
+                if not data:
+                    return jsonify({'status': 'error', 'message': 'Dados não fornecidos'}), 400
+                
+                action = data.get('action')
+                if not action:
+                    return jsonify({'status': 'error', 'message': 'Ação não especificada'}), 400
+                
+                if action == 'salvar_dados_principais':
+                    # Validar campos obrigatórios
+                    required_fields = ['cidadeDestino', 'dataSaida', 'dataRetorno', 'codigoRelatorio']
+                    for field in required_fields:
+                        if not data.get(field):
+                            return jsonify({'status': 'error', 'message': f'Campo {field} é obrigatório'}), 400
+                    
+                    # Converter datas
+                    try:
+                        data_inicio = datetime.strptime(data['dataSaida'], '%Y-%m-%d')
+                        data_fim = datetime.strptime(data['dataRetorno'], '%Y-%m-%d')
+                    except ValueError:
+                        return jsonify({'status': 'error', 'message': 'Formato de data inválido'}), 400
+                    
+                    # Criar nova viagem
+                    nova_viagem = RegistroViagens(
+                        entidade_destino=data['cidadeDestino'],
+                        data_inicio=data_inicio,
+                        data_fim=data_fim,
+                        n_intranet=data['codigoRelatorio'],
+                        tipo_viagem=data.get('tipoViagem', ''),
+                        descricao=data.get('descricao', ''),
+                        # usuario=current_user.username if current_user.is_authenticated else 'Sistema',
+                        ativo=True
+                    )
+                    
+                    db.session.add(nova_viagem)
+                    db.session.commit()
+                    
+                    return jsonify({
+                        'status': 'success',
+                        'message': 'Viagem cadastrada com sucesso',
+                        'viagem_id': nova_viagem.id
+                    })
+                
+                elif action == 'salvar_gasto':
+                    print(f"salvar_gasto: {data}")
+                    # return salvar_gasto(request)
+              
+                
+                return jsonify({'status': 'error', 'message': 'Ação não reconhecida'}), 400
+            
+            return jsonify({'status': 'error', 'message': 'Requisição inválida'}), 400
+        
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def processar_ajax(request):
+    """Processa requisições AJAX para diferentes abas do formulário"""
+    action = request.form.get('action')
+    
+    if action == 'salvar_dados_principais':
+        return salvar_dados_principais(request)
+    elif action == 'salvar_gasto':
+        return salvar_gasto(request)
+    elif action == 'salvar_outros':
+        return salvar_outros(request)
+    elif action == 'listar_gastos':
+        return listar_gastos(request)
+    elif action == 'excluir_gasto':
+        return excluir_gasto(request)
+    elif action == 'obter_gasto':
+        return obter_gasto(request)
+    
+    return jsonify({'status': 'error', 'message': 'Ação não reconhecida'}), 400
+
+def salvar_dados_principais(request):
+    """Salva os dados principais da viagem"""
+    try:
+        # Validar dados
+        entidade_destino = request.form.get('cidadeDestino')
+        data_inicio = datetime.strptime(request.form.get('dataSaida'), '%Y-%m-%d')
+        data_fim = datetime.strptime(request.form.get('dataRetorno'), '%Y-%m-%d')
+        n_intranet = request.form.get('codigoRelatorio')
+        tipo_viagem = request.form.get('tipoViagem')
+        descricao = request.form.get('descricao')
+        
+        # Criar novo registro de viagem
+        nova_viagem = RegistroViagens(
+            entidade_destino=entidade_destino,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            n_intranet=n_intranet,
+            tipo_viagem=tipo_viagem,
+            descricao=descricao,
+            # usuario=session['username'] if current_user.is_authenticated else 'Sistema',
+            ativo=True
+        )
+        
+        db.session.add(nova_viagem)
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Viagem cadastrada com sucesso',
+            'viagem_id': nova_viagem.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': f'Erro ao salvar viagem: {str(e)}'
+        }), 500
+
+def salvar_gasto(request):
+    """Salva um gasto associado à viagem"""
+    try:
+        viagem_id = request.form.get('viagemIdGasto')
+        if not viagem_id:
+            raise BadRequest('ID da viagem não informado')
+        
+        # Verificar se a viagem existe
+        viagem = RegistroViagens.query.get(viagem_id)
+        if not viagem:
+            raise BadRequest('Viagem não encontrada')
+        
+        # Processar upload do arquivo
+        arquivo_id = None
+        if 'documentoUpload' in request.files:
+            file = request.files['documentoUpload']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+                filepath = os.path.join(UPLOAD_FOLDER, filename)
+                file.save(filepath)
+                
+                novo_documento = DocumentosViagens(
+                    arquivo=filepath,
+                    data=datetime.now()
+                )
+                db.session.add(novo_documento)
+                db.session.flush()
+                arquivo_id = novo_documento.id
+        
+        # Criar novo gasto
+        novo_gasto = GastosViagens(
+            viagem=viagem_id,
+            tipo_gasto=request.form.get('tipoGasto'),
+            descricao=request.form.get('descricaoGasto'),
+            valor=request.form.get('valor', 0),
+            arquivo=arquivo_id,
+            estorno=request.form.get('estorno') == 'on',
+            data=datetime.strptime(request.form.get('dataHoraGasto'), '%Y-%m-%dT%H:%M') if request.form.get('dataHoraGasto') else datetime.now()
+        )
+        
+        db.session.add(novo_gasto)
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Gasto salvo com sucesso',
+            'gasto_id': novo_gasto.id
+        })
+    
+
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': f'Erro ao salvar gasto: {str(e)}'
+        }), 500
+
+def salvar_outros(request):
+    """Salva as informações adicionais da viagem"""
+    try:
+        viagem_id = request.form.get('viagemIdOutros')
+        if not viagem_id:
+            return jsonify({'status': 'error', 'message': 'ID da viagem não informado'}), 400
+            
+        viagem = RegistroViagens.query.get(viagem_id)
+        if not viagem:
+            return jsonify({'status': 'error', 'message': 'Viagem não encontrada'}), 404
+        
+        # Atualizar informações
+        viagem.veiculo = request.form.get('veiculo')
+        viagem.placa = request.form.get('placa')
+        viagem.km_inicial = request.form.get('kmInicial')
+        viagem.km_final = request.form.get('kmFinal')
+        
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Informações adicionais salvas com sucesso'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': f'Erro ao salvar informações: {str(e)}'
+        }), 500
+
+def listar_gastos(request):
+    """Retorna a lista de gastos de uma viagem"""
+    viagem_id = request.args.get('viagem_id')
+    if not viagem_id:
+        return jsonify({'status': 'error', 'message': 'ID da viagem não informado'}), 400
+    
+    gastos = GastosViagens.query.filter_by(viagem=viagem_id, ativo=True).all()
+    
+    gastos_data = []
+    for gasto in gastos:
+        documento = DocumentosViagens.query.get(gasto.arquivo) if gasto.arquivo else None
+        gastos_data.append({
+            'id': gasto.id,
+            'tipo_gasto': gasto.tipo_gasto,
+            'descricao': gasto.descricao,
+            'valor': gasto.valor,
+            'data': gasto.data.strftime('%Y-%m-%d %H:%M'),
+            'estorno': gasto.estorno,
+            'documento': documento.arquivo if documento else None,
+            'tipo_documento': request.form.get('tipoDocumento')  # Adicionado para corresponder ao frontend
+        })
+    
+    return jsonify({
+        'status': 'success',
+        'gastos': gastos_data
+    })
+
+def obter_gasto(request):
+    """Retorna os dados de um gasto específico para edição"""
+    gasto_id = request.args.get('gasto_id')
+    if not gasto_id:
+        return jsonify({'status': 'error', 'message': 'ID do gasto não informado'}), 400
+    
+    gasto = GastosViagens.query.get(gasto_id)
+    if not gasto:
+        return jsonify({'status': 'error', 'message': 'Gasto não encontrado'}), 404
+    
+    documento = DocumentosViagens.query.get(gasto.arquivo) if gasto.arquivo else None
+    
+    return jsonify({
+        'status': 'success',
+        'gasto': {
+            'id': gasto.id,
+            'tipo_gasto': gasto.tipo_gasto,
+            'numero_documento': request.form.get('numeroDocumento'),  # Campo adicional do frontend
+            'descricao': gasto.descricao,
+            'observacao': request.form.get('observacaoGasto'),  # Campo adicional do frontend
+            'valor': gasto.valor,
+            'data_hora': gasto.data.strftime('%Y-%m-%dT%H:%M'),
+            'estorno': gasto.estorno,
+            'tipo_documento': request.form.get('tipoDocumento'),  # Campo adicional do frontend
+            'documento_path': documento.arquivo if documento else None
+        }
+    })
+
+def excluir_gasto(request):
+    """Exclui (desativa) um gasto"""
+    gasto_id = request.form.get('gasto_id')
+    if not gasto_id:
+        return jsonify({'status': 'error', 'message': 'ID do gasto não informado'}), 400
+    
+    try:
+        gasto = GastosViagens.query.get(gasto_id)
+        if not gasto:
+            return jsonify({'status': 'error', 'message': 'Gasto não encontrado'}), 404
+        
+        # Marcar como inativo (soft delete)
+        gasto.ativo = False
+        db.session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Gasto excluído com sucesso'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'status': 'error',
+            'message': f'Erro ao excluir gasto: {str(e)}'
+        }), 500
+
+def processar_formulario_principal(request):
+    """Processa o envio tradicional do formulário (não-AJAX)"""
+    # Esta função pode ser usada como fallback caso JavaScript esteja desabilitado
+    # Implementação similar às funções AJAX, mas com redirects e flash messages
+    pass

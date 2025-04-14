@@ -1,0 +1,89 @@
+/* Estilos personalizados para a página de cadastro de viagem */
+
+/* Estilo para as abas */
+.nav-tabs .nav-link {
+    font-weight: 500;
+    color: #495057;
+    background-color: #F0F8FF;
+}
+
+.nav-tabs .nav-link.active {
+    font-weight: 600;
+    color: #0d6efd;
+}
+body {
+    background:url(../images/imgFundoIntranet.png) fixed no-repeat top #104c83;
+    /* font-family:"Trebuchet MS", Verdana, Arial; */
+    /* font-size:13px; */
+    /* color:#333333; */
+}
+
+header {
+    /* background-color: #104c83; */
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+.mb-4{
+    /* font-size: 24px;
+    font-weight: bold; */
+    margin: 0;
+    color: #fff;
+}
+
+/* Espaçamento no conteúdo das abas */
+.tab-content {
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+}
+
+/* Estilo para os formulários */
+form {
+    max-width: 100%;
+}
+
+/* Estilo para campos obrigatórios */
+label.required:after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Estilo para a tabela de gastos */
+#tabelaGastos tr {
+    cursor: pointer;
+}
+
+#tabelaGastos tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Botões de ação na tabela */
+.btn-action {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    margin: 0 2px;
+}
+
+/* Responsividade para abas em dispositivos pequenos */
+@media (max-width: 576px) {
+    .nav-tabs .nav-item {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Estilo para campos calculados */
+input[readonly] {
+    background-color: #e9ecef;
+    opacity: 1;
+}
+
+/* Espaçamento entre seções */
+.section-divider {
+    margin: 20px 0;
+    border-top: 1px solid #dee2e6;
+}

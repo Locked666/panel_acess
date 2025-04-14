@@ -2,12 +2,23 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session,jsonify
 from flask_socketio import SocketIO, emit
 from datetime import datetime
+from werkzeug.utils import secure_filename
+from werkzeug.exceptions import BadRequest
 from functions import encrypt,decrypt
-from models import db, Entidade,Log, ConfigAcesso
+from models import db, Entidade,Log, ConfigAcesso#, RegistroViagens, GastosViagens, DocumentosViagens
+from config import Config
+from routes.viagens import viagem_bp
+from routes.gastos import gasto_bp
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('APP_SECRET_KEY')
 socketio = SocketIO(app)
+app.config.from_object(Config)
+    
+    # Registrar blueprints
+app.register_blueprint(viagem_bp)
+app.register_blueprint(gasto_bp)
+
 
 # Definindo o caminho absoluto para o banco de dados
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -80,6 +91,8 @@ def home():
 #     entidades = Entidade.query.all()
 #     acessos = ConfigAcesso.query.all()
 #     return render_template('cadastro_acesso.html', acessos=acessos, entidades=entidades)
+
+
 
 @app.route('/cadastro_acesso', methods=['GET', 'POST'])
 def cadastro_acesso():
@@ -208,6 +221,7 @@ def get_entidades():
     return jsonify(entidades_json)
 
 
+
 @app.route('/CheckStatus', methods=['GET'])
 def check_status():
     # Obtém usuário e senha dos parâmetros da requisição
@@ -305,6 +319,20 @@ def admin():
 
     entidades = Entidade.query.all()
     return render_template('admin.html', entidades=entidades)
+
+@app.route('/viagens', methods=['GET', 'POST'])
+def viagens():
+    if request.method == 'GET': 
+        return render_template('registro_viagens.html')
+    # Aqui você pode adicionar lógica para lidar com o envio de dados
+
+@app.route('/adicionar_viagem', methods=['GET', 'POST'])
+def adicionar_viagem():
+    if request.method == 'GET':
+        entidades = Entidade.query.all()
+        return render_template('adicionar_viagem.html', entidades=entidades)
+    
+
 
 @app.route('/log', methods=['GET', 'POST'])
 def log():
