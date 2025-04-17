@@ -5,3 +5,52 @@
     /* height: 10vh; */
     /* margin-left: 35%; */
 /* }  */
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+    /* background-color: #f8f9fa; */
+    /* background:url(../images/imgFundoIntranet.png) fixed no-repeat top #104c83; */
+}
+
+
+.container {
+    color: #333;
+    font-family: Arial, sans-serif;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Para melhor espaçamento */
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Melhor visualização dos inputs */
+.form-control, .form-select {
+    padding: 0.5rem 0.75rem;
+}
+
+/* Ajuste para os botões */
+.btn {
+    padding: 0.5rem 1.25rem;
+}
+
+/* Estilo personalizado para o accordion */
+.accordion-button {
+    font-weight: 500;
+    background-color: #f8f9fa;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #e9ecef;
+    color: #0d6efd;
+}
+
+.accordion-body {
+    padding: 1.5rem;
+}

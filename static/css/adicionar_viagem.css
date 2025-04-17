@@ -25,6 +25,16 @@ header {
     text-align: center;
 }
 
+.nav-link {
+    color: #fff;
+    font-weight: 500;
+    /* font-size: ; */
+}
+.nav-link:hover {
+    color: #fff;
+    background-color: #0d6efd;
+}
+
 .mb-4{
     /* font-size: 24px;
     font-weight: bold; */

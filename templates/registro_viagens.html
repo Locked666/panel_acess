@@ -12,115 +12,222 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/css/bootstrap-switch-button.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 
-<body> 
-    <!-- Barra de Navegação -->
-    <div class="nav">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">Bem-vindo, {{ session['username'] }}!</a>
-            <form class="form-inline" method="GET" action="{{ url_for('viagens') }}">
-                <input class="form-control mr-sm-2" type="search" name="filtro" placeholder="Filtrar Viagens" value="{{ request.args.get('filtro', '') }}">
-                <button class="btn btn-outline-success" type="submit">Pesquisar</button>
-            </form>
-        </nav>
-    </div>
-
-    <!--Div tabela-->
-    <div class="table-viagens">
-        <div class="mt-5">
-            <h3>Listagem de Viagens</h3>
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" id="search-filter" placeholder="Pesquisar..." aria-label="Pesquisar">
-                <button class="btn btn-outline-secondary" type="button" onclick="filterTable()">Filtrar</button>
-            </div>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Técnico</th>
-                        <th scope="col">Tipo de Conexão</th>
-                        <th scope="col">ID da Conexão</th>
-                        <th scope="col">Porta</th>
-                        <th scope="col"></th>
-                        <th scope="col">Ativo</th>
-                        <th scope="col">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for viagem in viagens %}
-                        <tr>
-                            <th scope="row">{{ loop.index }}</th>
-                            <td>{{ viagem.entidade }}</td>
-                            <td>{{ viagem.tipo_conexao }}</td>
-                            <td>{{ viagem.id_conexao }}</td>
-                            <td>{{ viagem.port_conexao }}</td>
-                            <td>{{ viagem.usuario }}</td>
-                            <td>{{ viagem.ativo }}</td>
-                            <td>
-                                <a href="{{ url_for('editar_viagem', id=viagem.id) }}" class="btn btn-primary">Editar</a>
-                                <form action="{{ url_for('deletar_viagem', id=viagem.id) }}" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-danger">Deletar</button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}        
-
-                </tbody>
-            </table>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Usuário Conectado - <strong>{{usuario.usuario}}</strong></a>
+            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+            <a class="nav-link" href="{{ url_for('viagens') }}">Viagens</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
         </div>
-        <div class="mt-3">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" name='bnt-add-viagem' id='bnt-add-viagem' data-bs-target="#addViagemModal"b>Adicionar Viagem</button> 
-        </div>
-        <!-- Modal para Adicionar Viagem -->
-        <div class="modal fade" id="addViagemModal" tabindex="-1" aria-labelledby="addViagemModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addViagemModalLabel">Adicionar Nova Viagem</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </nav>
+
+<body>
+    <div class="container"> 
+
+        <!-- Group Filter for Table-->
+        <form class="mb-4">
+            <div class="accordion" id="filtrosAccordion">
+                <!-- Accordion Item - Período -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePeriodo" aria-expanded="true" aria-controls="collapsePeriodo">
+                            <i class="bi bi-calendar-range me-2"></i>Filtrar por Período
+                        </button>
+                    </h2>
+                    <div id="collapsePeriodo" class="accordion-collapse collapse show" data-bs-parent="#filtrosAccordion">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="filtro-data-inicial" class="form-label fw-bold">Data Inicial</label>
+                                    <input type="date" class="form-control" id="filtro-data-inicial" name="filtro-data-inicial" 
+                                           value="{{ request.args.get('filtro-data-inicial', '') }}">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="filtro-data-final" class="form-label fw-bold">Data Final</label>
+                                    <input type="date" class="form-control" id="filtro-data-final" name="filtro-data-final"
+                                           value="{{ request.args.get('filtro-data-final', '') }}">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <form method="POST" action="{{ url_for('adicionar_viagem') }}">
-                        <div class="modal-body">
+                </div>
+        
+                <!-- Accordion Item - Entidade -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEntidade" aria-expanded="false" aria-controls="collapseEntidade">
+                            <i class="bi bi-building me-2"></i>Filtrar por Entidade
+                        </button>
+                    </h2>
+                    <div id="collapseEntidade" class="accordion-collapse collapse" data-bs-parent="#filtrosAccordion">
+                        <div class="accordion-body">
                             <div class="mb-3">
-                                <label for="entidade" class="form-label">Técnico</label>
-                                <input type="text" class="form-control" id="entidade" name="entidade" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="tipo_conexao" class="form-label">Tipo de Conexão</label>
-                                <input type="text" class="form-control" id="tipo_conexao" name="tipo_conexao" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="id_conexao" class="form-label">ID da Conexão</label>
-                                <input type="text" class="form-control" id="id_conexao" name="id_conexao" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="port_conexao" class="form-label">Porta</label>
-                                <input type="text" class="form-control" id="port_conexao" name="port_conexao" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="usuario" class="form-label">Usuário</label>
-                                <input type="text" class="form-control" id="usuario" name="usuario" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="ativo" class="form-label">Ativo</label>
-                                <select class="form-select" id="ativo" name="ativo" required>
-                                    <option value="Sim">Sim</option>
-                                    <option value="Não">Não</option>
+                                <label for="filtro-entidade" class="form-label fw-bold">Selecione a Entidade</label>
+                                <select class="form-select" id="filtro-entidade" name="filtro-entidade">
+                                    <option value="">Todas as Entidades</option>
+                                    {% for entidade in entidades %}
+                                    <option value="{{ entidade.id }}" 
+                                            {% if request.args.get('filtro-entidade') == entidade.id|string %}selected{% endif %}>
+                                        {{ entidade.nome }}
+                                    </option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+        
+                <!-- Accordion Item - Relatório -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRelatorio" aria-expanded="false" aria-controls="collapseRelatorio">
+                            <i class="bi bi-file-earmark-text me-2"></i>Filtrar por Relatório
+                        </button>
+                    </h2>
+                    <div id="collapseRelatorio" class="accordion-collapse collapse" data-bs-parent="#filtrosAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                <label for="filtro-relatorio" class="form-label fw-bold">Número do Relatório</label>
+                                <input type="text" class="form-control" id="filtro-relatorio" name="filtro-relatorio"
+                                       placeholder="Digite o número do relatório"
+                                       value="{{ request.args.get('filtro-relatorio', '') }}">
+                            </div>
                         </div>
-                    </form>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Botões de Ação -->
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" class="btn btn-outline-secondary" id="btn-limpar-filtros">
+                    <i class="bi bi-eraser me-2"></i>Limpar
+                </button>
+                <button type="submit" class="btn btn-primary" id="btn-filtrar">
+                    <i class="bi bi-funnel me-2"></i>Aplicar
+                </button>
+                <button type="submit" class="btn btn-success" name="imprimir" value="true">
+                    <i class="bi bi-printer me-2"></i>Imprimir
+                </button>
+                <button type="button" class="btn btn-info" id='bnt-add-viagem' href="{{ url_for('adicionar_viagem')}}">
+                    <i class="bi bnt-add-viagem me-2"></i>Adicionar
+                </button>
+            </div>
+        </form>
+
+        <!--Div tabela-->
+        <div class="table-viagens">
+            <div class="mt-5">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Técnico</th>
+                            <th scope="col">Entidade</th>
+                            <th scope="col">Data Inicial</th>
+                            <th scope="col">Data Final</th>
+                            <th scope="col">Tipo da Viagem</th>
+                            <th scope="col">Total de Gasto</th>
+                            <th scope="col">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for viagem in viagens %}
+                            <tr>
+                                <th scope="row">{{ viagem.id }}</th>
+                                
+                                <td>{{ viagem.usuario_nome }}</td>
+                                <td>{{ viagem.entidade_nome }}</td>
+                                <td>{{ viagem.data_formatada }}</td>
+                                <td>{{ viagem.data_final_formatada }}</td>
+                                <td>{{ viagem.tipo_viagem }}</td>
+                                <td>R$ {{ viagem.total_gasto }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary btn-action visualizar-viagem" title="Visualizar" value="{{ viagem.id }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning btn-action editar-viagem" title="Editar" value="{{ viagem.id }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}        
+
+                    </tbody>
+                </table>
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination">
+                      <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                      <li class="page-item"><a class="page-link" href="#">1</a></li>
+                      <li class="page-item"><a class="page-link" href="#">2</a></li>
+                      <li class="page-item"><a class="page-link" href="#">3</a></li>
+                      <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                    </ul>
+                  </nav>
+            </div>
+            
+        </div>   
+    </div>
+    
+
+    <!-- Modal Viewer Viagens -->
+    <div class="modal fade" id="modalVisualizarViagem" tabindex="-1" aria-labelledby="modalVisualizarViagemLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalVisualizarViagemLabel">Detalhes da Viagem</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Técnico:</label>
+                            <p id="detalhe-tecnico"></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Entidade:</label>
+                            <p id="detalhe-entidade"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Data Inicial:</label>
+                            <p id="detalhe-data-inicial"></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Data Final:</label>
+                            <p id="detalhe-data-final"></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Tipo da Viagem:</label>
+                            <p id="detalhe-tipo-viagem"></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Total de Gasto:</label>
+                            <p id="detalhe-total-gasto"></p>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descrição:</label>
+                        <p id="detalhe-descricao"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                 </div>
             </div>
         </div>
-            
-
-
-    </div>   
-    <script src="{{ url_for('static', filename='js/iagens.js') }}"></script>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/viagens.js') }}"></script>
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>    

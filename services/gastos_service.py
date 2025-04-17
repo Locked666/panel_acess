@@ -11,6 +11,7 @@ def criar_gasto(dados):
             tipo_gasto=dados['tipoGasto'],
             descricao=dados['descricao'],
             valor=dados['valor'],
+            arquivo=dados.get('arquivo'),
             estorno=dados.get('estorno', False)
         )
         

@@ -44,6 +44,35 @@ def listar():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
+@gasto_bp.route('/total/<int:viagem_id>', methods=['GET'])
+def calc_total(viagem_id):
+    try:
+        gastos = listar_gastos_por_viagem(viagem_id)
+        
+        if not gastos:
+            return jsonify({
+                'status': 'success',
+                'total': 0,
+                'estorno': 0
+            })
+
+        total = sum(g.valor for g in gastos )
+        total_estorno = sum(g.valor for g in gastos if g.ativo and g.estorno)
+        
+        return jsonify({
+            'status': 'success',
+            'total': total,
+            'estorno': total_estorno
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': f'Erro ao calcular total: {str(e)}'
+        }), 500
+        
+        
 @gasto_bp.route('/<int:gasto_id>', methods=['DELETE'])
 def excluir(gasto_id):
     try:
