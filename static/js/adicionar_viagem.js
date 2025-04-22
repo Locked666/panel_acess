@@ -237,6 +237,7 @@ async function atualizarTabelaGastos(frmdata, idGasto, uploadDocumento) {
     // Atualiza a tabela de gastos
     const tabelaGastos = document.getElementById('tabelaGastos');
     const novaLinha = tabelaGastos.insertRow();
+    novaLinha.setAttribute('data-gasto-id', idGasto);
     if (tabelaGastos.querySelector('tr td[colspan="5"]')) {
         tabelaGastos.innerHTML = '';
     };
@@ -405,6 +406,32 @@ async function uploadDocumento(viagemId, fileInput) {
 }
 
 
+// Excluir Gastos 
+async function excluirGasto(gastoId) {
+    try {
+        // Exclui o gasto
+        const response = await fetch(`/api/gastos/${gastoId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro: ${errorData.message}`);
+        }
+
+        // Remove a linha da tabela
+        const linha = document.querySelector(`tr[data-gasto-id="${gastoId}"]`);
+        if (linha) linha.remove();
+        
+        // Atualiza o total de gastos  
+        await atulizarTotalGasto(); 
+
+        showToast('Gasto excluído com sucesso!', 'success');
+        
+    } catch (error) {
+        handleError('Erro ao excluir gasto', error);
+    }
+}
 
 // Formatar Data 
 async function formatarData(dataISO) {

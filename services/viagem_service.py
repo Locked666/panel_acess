@@ -1,4 +1,4 @@
-from models import RegistroViagens, Entidade, db
+from models import RegistroViagens, Entidade, db, Usuarios
 from utils.validators import validar_dados_viagem
 from utils.exceptions import APIError
 from datetime import datetime
@@ -82,11 +82,11 @@ def consultar_viagens(viagemid):
         if query.entidade_destino:
             query.entidade_nome = Entidade.query.get(query.entidade_destino).nome
         if query.usuario:
-            query.usuario_nome = Entidade.query.get(query.usuario).usuario
+            query.usuario_nome = Usuarios.query.get(query.usuario).usuario
         if query.data_inicio:
-            query.data_inicio = query.data_inicio.strftime('%Y-%m-%d %H:%M:%S')
+            query.data_inicio = query.data_inicio.strftime('%d/%m/%Y %H:%M')
         if query.data_fim:
-            query.data_fim = query.data_fim.strftime('%Y-%m-%d %H:%M:%S')    
+            query.data_fim = query.data_fim.strftime('%d/%m/%Y %H:%M')    
             
     # if not query:
     #     raise APIError(f'Viagem não encontrada {query}', 404)
