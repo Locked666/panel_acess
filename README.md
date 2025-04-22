@@ -73,4 +73,4 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 ---
 
-Desenvolvido com ❤️ por [Seu Nome](https://github.com/Locked666).
+Desenvolvido com ❤️ por [Julio Sales](https://github.com/Locked666).
