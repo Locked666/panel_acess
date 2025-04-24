@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Set User</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -16,20 +17,31 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f8f9fa;
+            background-color: #201b2c;
         }
         .center {
-            color: #333;
+            /*color: #333;*/
+            color:#FFA500;
             text-color: #333;
             font-family: Arial, sans-serif;
-            background-color: white;
+            background: #201b2c;
+            /*background-color: white;*/
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0px 10px 40px #00000056;
         }
         .form-select {
-            width: 300px;
+            width: 100%;
             margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            background: #514869;
+            color: #f0ffffde;
+            font-size: 16pt;
+            box-shadow: 0px 10px 40px #00000056;
+            outline: none;
+            box-sizing: border-box;
         }
         button {
             background-color: #007bff;

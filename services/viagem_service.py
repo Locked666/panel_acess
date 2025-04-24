@@ -73,10 +73,7 @@ def deletar_viagem(viagem_id):
         raise APIError(str(e), 400)
 
 def consultar_viagens(viagemid):
-    print(f"\nConsultando viagem com ID: {viagemid}\n")
     query = RegistroViagens.query.filter(RegistroViagens.id == int(viagemid)).first()
-    
-    print(f"\nResultado da consulta: { query.__dict__}\n")
     
     if query:
         if query.entidade_destino:

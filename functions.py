@@ -1,10 +1,12 @@
 from cryptography.fernet import Fernet
+
 import os 
 # from model import SysConfig, CONN, Base,engine,session
 
 # Gera uma chave para o Fernet
 def generate_key():
     return Fernet.generate_key()
+
 
 # Função para encriptar a senha
 def encrypt(password, key, salt):

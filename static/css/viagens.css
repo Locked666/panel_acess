@@ -7,12 +7,12 @@
 /* }  */
 
 body {
-    display: flex;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; */
     /* height: 100vh; */
     /* background-color: #f8f9fa; */
-    /* background:url(../images/imgFundoIntranet.png) fixed no-repeat top #104c83; */
+    background:url(../images/imgFundoIntranet.png) fixed no-repeat top #104c83;
 }
 
 
@@ -53,4 +53,20 @@ body {
 
 .accordion-body {
     padding: 1.5rem;
+}
+
+@media (max-width: 576px) {
+    .nav-tabs .nav-item {
+        width: 100%;
+        text-align: center;
+    }
+    .accordion .accordion-item {
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+    body {
+        padding: 0 1rem;
+        background: #104c83;
+        width: 100%;
+    }
 }

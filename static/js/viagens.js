@@ -51,6 +51,14 @@ document.getElementById('btn-limpar-filtros').addEventListener('click', function
     });
 });
 
+async function abrirRelatorioPDF(event) {
+    event.preventDefault(); // Impede o link de recarregar a página
+
+    const urlAtual = new URL(window.location.href);
+    urlAtual.searchParams.set("imprimir", "true");
+
+    window.open(urlAtual.toString(), "_blank");
+}
 //adicionar o evento de visualizar o modal o modal
 
 document.addEventListener('DOMContentLoaded', function () {

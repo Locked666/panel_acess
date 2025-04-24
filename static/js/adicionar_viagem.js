@@ -12,7 +12,6 @@ const appState = {
     gastos: [],
     usuario: document.getElementById('usuario').value || null, // ID do usuário logado
     valor: 0,
-    // Não precisamos mais carregar cidades via API
 };
 
 // =============================================

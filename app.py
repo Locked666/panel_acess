@@ -134,8 +134,10 @@ def gerar_relatorio_pdf(viagens, usuario_nome='', data_inicial=None, data_final=
 
     response = make_response(buffer.read())
     response.headers.set('Content-Type', 'application/pdf')
-    response.headers.set('Content-Disposition', 'attachment', filename='relatorio_viagens.pdf')
+    response.headers.set('Content-Disposition', 'inline', filename='relatorio_viagens.pdf')
     return response
+
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -640,7 +642,8 @@ def viagens():
     if data_inicio_str:
         try:
             data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%d')
-            query = query.filter(RegistroViagens.data_inicio >= data_inicio)
+            query = query.filter(RegistroViagens.data_inicio >= f"{data_inicio}")
+            print(f"{data_inicio}")
         except ValueError as e:
             print(f"Erro ao converter data de início: {data_inicio_str}\n{e}")
             pass
@@ -648,7 +651,8 @@ def viagens():
     if data_fim_str:
         try:
             data_fim = datetime.strptime(data_fim_str, '%Y-%m-%d')
-            query = query.filter(RegistroViagens.data_inicio <= data_fim)
+            query = query.filter(RegistroViagens.data_fim <= f"{datetime.strftime(data_fim, '%Y-%m-%d 23:59:59')}")
+            print(f"{datetime.strftime(data_fim, '%Y-%m-%d 23:59:59')}")
         except ValueError as e:
             print(f"Erro ao converter data de final: {data_fim}\n{e}")
             pass
