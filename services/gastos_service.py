@@ -1,4 +1,4 @@
-from models import GastosViagens, RegistroViagens, db
+from models import GastosViagens, RegistroViagens,DocumentosViagens, db
 from utils.validators import validar_dados_gasto
 from utils.exceptions import APIError
 
@@ -24,10 +24,39 @@ def criar_gasto(dados):
         raise APIError(str(e), 400)
 
 def listar_gastos_por_viagem(viagem_id):
-    return GastosViagens.query.filter_by(
-        viagem=viagem_id,
-        ativo=True
-    ).all()
+    try:
+        gastos = GastosViagens.query.filter_by(
+            viagem=viagem_id,
+            ativo=True
+        ).all()
+        if not gastos:
+            raise APIError('Nenhum gasto encontrado para esta viagem', 404)
+        for gasto in gastos:
+            if gasto.arquivo:
+                arquivo = DocumentosViagens.query.get(gasto.arquivo)
+                if arquivo:
+                    gasto.documento = arquivo.arquivo
+                else:
+                    gasto.documento = None
+
+        # if gastos.arquivo:
+        #     for gasto in gastos:
+        #         arquivo = DocumentosViagens.query.get(gasto.arquivo)
+        #         if arquivo:
+        #             gasto.arquivo = arquivo.arquivo
+        #             gasto.tipo_documento = arquivo.tipo
+        #         else:
+        #             gasto.arquivo = None
+        #             gasto.tipo_documento = None
+        
+        return gastos
+    except Exception as e:
+        db.session.rollback()
+        raise APIError(str(e), 400)
+    
+    
+    
+    return 
 
 def excluir_gasto(gasto_id):
     gasto = GastosViagens.query.get(gasto_id)
@@ -36,3 +65,7 @@ def excluir_gasto(gasto_id):
     
     gasto.ativo = False
     db.session.commit()
+    
+if __name__ == '__main__':
+    g = listar_gastos_por_viagem(60)
+    print(g)

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
     <title>Cadastro de Viagem</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -52,18 +53,23 @@
             <!-- Aba 1: Dados Principais -->
             <div class="tab-pane fade show active" id="dados" role="tabpanel" aria-labelledby="dados-tab">
                 <form id="formDadosPrincipais" action>
-                    <input type="hidden" id="viagemId" name="viagemId">
+                    <input type="hidden" id="viagemId" name="viagemId" value="">
                     <input type="hidden" id="usuario" name="usuario" value="{{ session['usuarioConnect'] }}">
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="cidadeDestino" class="form-label">Cidade Destino *</label>
+                            <!--<label for="cidadeDestino" class="form-label">Cidade Destino *</label>
                             <select class="form-select" id="cidadeDestino" name="cidadeDestino" required>
                                 <option value="" selected disabled>Selecione uma cidade</option>
                                 {% for entidade in entidades %}
                                 <option value="{{ entidade.id }}">{{ entidade.nome }}</option>
                                 {% endfor %}
-                            </select>
+                            </select>-->
+                            <!--<div class="col-md-4">-->
+                                <label for="entidade" class="form-label">Entidade Destino</label>
+                                <input type="text" class="form-control" id="entidade" name="entidade" placeholder="Digite o nome da entidade">
+                                <input type="hidden" id="entidade-id" name="entidade-id"> <!-- Para armazenar o ID da entidade selecionada -->
+                            <!--</div>-->
                         </div>
                         <div class="col-md-3">
                             <label for="dataSaida" class="form-label">Data de Saída *</label>
@@ -280,7 +286,12 @@
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static', filename='js/adicionar_viagem.js') }}"></script>
+
 </body>
 </html>

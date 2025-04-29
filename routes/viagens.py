@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify,session
 from services.viagem_service import criar_viagem, listar_cidades, update_viagem,consultar_viagens
 from utils.exceptions import APIError
 
@@ -14,6 +14,7 @@ def listar():
 @viagem_bp.route('/consulta', methods=['GET'])
 def consulta():
     try:
+        
         viagem_id = request.args.get('viagemId')
         if not viagem_id:
             raise APIError('ID da viagem não informado', 400)
@@ -22,16 +23,23 @@ def consulta():
         # Exemplo: viagem = consultar_viagem(viagem_id)
         viagem = consultar_viagens(int(viagem_id))
         if not viagem:
-            raise APIError('Viagem não encontrada', 404)
+            raise APIError('Viagem não encontrada', 404) 
+        
+        if int(session.get('usuarioConnect')) != int(viagem.usuario):
+            # print(f"\n{session.get('usuarioConnect')} != {viagem.usuario}\n")
+            raise APIError('Usuário não autorizado', 403)
+        
+        
         
         return jsonify({
                 "tecnico": viagem.usuario_nome,
                 "entidade": viagem.entidade_nome,
+                "entidade_id": viagem.entidade_destino,
                 "data_inicio": viagem.data_inicio,
                 "data_fim": viagem.data_fim,
                 "tipo_viagem": viagem.tipo_viagem,
-                "n_diarias": viagem.n_diaria,
-                "valor_diaria": viagem.v_diaria,
+                "n_diarias": int(viagem.n_diaria),
+                "valor_diaria": float(viagem.v_diaria),
                 "descricao": viagem.descricao,
                 "n_intranet": viagem.n_intranet,
                 "total_gasto": viagem.total_gasto,
@@ -44,14 +52,25 @@ def consulta():
 @viagem_bp.route('/', methods=['POST'])
 def criar():
     try:
-        data = request.get_json()
-        print(f"\nDados recebidos: {data}\n")
+        data = request.get_json()    
+        user = session.get('usuarioConnect')
+        if not user:
+            raise APIError('Usuário não autenticado', 401)
+        # id_viagem =request.args.get('viagemId', '') 
+        # print(f"Dados recebidos: {request.args.__dict__}")
+        
+        if user != data['usuario']:
+            raise APIError('Usuário não autorizado', 403)
         
         if data.get('viagemId'):
+        # if id_viagem:
+            print(f'\nAtualizando viagem com ID: {data["viagemId"]}\n')
+            # Verificar se a viagem existe
             # Atualizar viagem existente
             update_viagem(data)
             return jsonify({'status': 'success', 'message': 'Viagem atualizada com sucesso'}), 200
         else :
+            print(f'\nCriando nova viagem com dados: {data}\n')
             viagem = criar_viagem(data)
         
         

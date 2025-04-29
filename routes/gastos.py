@@ -22,7 +22,7 @@ def criar():
     except Exception as e:
         return jsonify({'status': 'error', 'message': 'Erro interno'}), 500
 
-@gasto_bp.route('/', methods=['GET'])
+@gasto_bp.route('/consulta', methods=['GET'])
 def listar():
     try:
         viagem_id = request.args.get('viagemId')
@@ -35,6 +35,10 @@ def listar():
             'gastos': [{
                 'id': g.id,
                 'tipoGasto': g.tipo_gasto,
+                'nDocumento': g.arquivo,
+                'Documento': g.documento,
+                'tipoDocumento': g.tipo_documento,
+                'descricao': g.descricao,
                 'valor': g.valor,
                 'data': g.data.isoformat()
             } for g in gastos]

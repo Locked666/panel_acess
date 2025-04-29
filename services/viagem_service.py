@@ -38,6 +38,13 @@ def criar_viagem(dados):
         raise APIError(str(e), 400)
 
 def update_viagem(dados):
+    # Converter strings para objetos datetime
+    try:
+        # Formato ISO 8601 (2025-04-15T16:46)
+        data_inicio = datetime.fromisoformat(dados['dataSaida'])
+        data_fim = datetime.fromisoformat(dados['dataRetorno'])
+    except ValueError as e:
+        raise APIError({'status': 'error', 'message': f'Formato de data inválido: {str(e)}'}, 400)
     try:
         viagem = RegistroViagens.query.get(dados['viagemId'])
         if not viagem:
@@ -45,11 +52,11 @@ def update_viagem(dados):
         
         # Atualizar os campos da viagem
         viagem.entidade_destino = dados['cidadeDestino']
-        viagem.data_inicio = dados['dataSaida']
+        viagem.data_inicio = data_inicio
         viagem.tipo_viagem = dados['tipoViagem']
         viagem.n_diaria = dados['numeroDiarias']
         viagem.v_diaria = dados['valorDiaria']
-        viagem.data_fim = dados['dataRetorno']
+        viagem.data_fim = data_fim
         viagem.n_intranet = dados['codigoRelatorio']
         viagem.usuario = dados['usuario']
         viagem.descricao = dados.get('descricao', '')
@@ -81,12 +88,14 @@ def consultar_viagens(viagemid):
         if query.usuario:
             query.usuario_nome = Usuarios.query.get(query.usuario).usuario
         if query.data_inicio:
-            query.data_inicio = query.data_inicio.strftime('%d/%m/%Y %H:%M')
+            query.data_inicio = query.data_inicio.strftime('%Y-%m-%d %H:%M')
         if query.data_fim:
-            query.data_fim = query.data_fim.strftime('%d/%m/%Y %H:%M')    
+            query.data_fim = query.data_fim.strftime('%Y-%m-%d %H:%M')    
             
     # if not query:
     #     raise APIError(f'Viagem não encontrada {query}', 404)
     return query
+
+
 def listar_cidades():
     return Entidade.query.filter_by(ativo=True).all()

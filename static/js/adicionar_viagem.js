@@ -14,6 +14,31 @@ const appState = {
     valor: 0,
 };
 
+const urlAtual = new URL(window.location.href);
+const viagemId = urlAtual.searchParams.get("viagemId");
+if (viagemId) {
+    appState.viagemId = viagemId;
+    // loadViagemData(viagemId);
+
+    // Carregar dados da viagem
+    executarTarefa(() => {
+        loadViagemData(viagemId);
+    });
+    
+    // executarTarefa();
+
+    document.getElementById('financeiro-tab').removeAttribute('disabled');
+    document.getElementById('outros-tab').removeAttribute('disabled');
+    document.getElementById('bnt-salvar-principal').innerText='Atualizar Dados' // Desabilitar botão de salvar dados principais
+
+} else {
+    // Se não houver ID de viagem, desabilitar abas secundárias
+    if (debug) console.log('Nenhum ID de viagem encontrado. Habilitando apenas a aba principal.');
+    // document.getElementById('bnt-salvar-principal').removeAttribute('style'); // Habilitar botão de salvar dados principais
+    document.getElementById('financeiro-tab').setAttribute('disabled', 'disabled');
+    document.getElementById('outros-tab').setAttribute('disabled', 'disabled');
+
+}     
 // =============================================
 // FUNÇÕES PRINCIPAIS
 // =============================================
@@ -21,6 +46,16 @@ const appState = {
 /**
  * Calcula dias e valor da diária automaticamente
  */
+
+function executarTarefa(fnc){
+    mostrarLoadingEnquanto();
+    setTimeout(() => {
+        fnc();
+        closeModalLoading();
+    }, 2000);
+}
+    
+
 function calcularDiasEDiaria() {
     const dataSaida = document.getElementById('dataSaida');
     const dataRetorno = document.getElementById('dataRetorno');
@@ -100,7 +135,8 @@ async function salvarDadosPrincipais(event) {
     
     try {
         const formData = {
-            cidadeDestino: document.getElementById('cidadeDestino').value,
+            viagemId: appState.viagemId || null, // ID da viagem, se já existir
+            cidadeDestino: document.getElementById('entidade-id').value,
             dataSaida: document.getElementById('dataSaida').value,
             dataRetorno: document.getElementById('dataRetorno').value,
             numeroDiarias: document.getElementById('quantidadeDiarias').value,
@@ -148,6 +184,43 @@ async function salvarDadosPrincipais(event) {
         if (debug) console.error('Detalhes do erro:', error);
     }
 }
+
+async function mostrarLoadingEnquanto() {
+    // Cria o modal se não existir
+    if (!document.getElementById('modalLoading')) {
+        criarModalLoading();
+    }
+
+    const modalElement = document.getElementById('modalLoading');
+    const modal = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+    });
+
+    modal.show();
+}
+
+function criarModalLoading() {
+    const modalHtml = `
+    <div class="modal fade" id="modalLoading" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0 shadow-none">
+          <div class="modal-body text-center">
+            <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <div class="mt-2 text-white">Aguarde, processando...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+
+
 
 /**
  * Salva um novo gasto associado à viagem
@@ -275,6 +348,80 @@ async function atualizarTabelaGastos(frmdata, idGasto, uploadDocumento) {
     }
 
 }
+
+async function loadGastos(viagemId) {
+    try {
+        const response = await fetch(`/api/gastos/${viagemId}`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar gastos');
+        }
+        const data = await response.json();
+        if (debug) console.log('Gastos carregados:', data);
+    } catch (error) {   
+        showToast('Erro ao carregar gastos', 'error');
+        if (debug) console.error('Erro ao carregar gastos:', error);
+    }
+}
+
+// Carregar dados da viagem
+
+async function loadViagemData(viagemId) {
+    try {
+        const response = await fetch(`/api/viagens/consulta?viagemId=${viagemId}`);
+        if (!response.ok) {
+            throw new Error('Erro ao carregar dados da viagem');
+        
+        }
+        const data = await response.json();
+        if (debug) console.log('Dados da viagem carregados:', data);
+        // Preencher os campos do formulário com os dados da viagem
+        document.getElementById('entidade').value = data.entidade || '';
+        document.getElementById('entidade-id').value = data.entidade_id || '';
+        document.getElementById('dataSaida').value = data.data_inicio || '';
+        document.getElementById('dataRetorno').value = data.data_fim || '';
+        document.getElementById('quantidadeDiarias').value = data.n_diarias || '';
+        document.getElementById('valorDiaria').value = data.valor_diaria || '';
+        document.getElementById('codigoRelatorio').value = data.n_intranet || '';
+        document.getElementById('tipoViagem').value = data.tipo_viagem || '';
+        document.getElementById('descricao').value = data.descricao || '';
+        
+        // Preencher a tabela de gastos
+        const tabelaGastos = document.getElementById('tabelaGastos');
+        tabelaGastos.innerHTML = ''; // Limpar tabela antes de preencher
+        
+
+        
+    } catch (error) {
+        showToast('Erro ao carregar dados da viagem', 'error');
+        if (debug) console.error('Erro ao carregar dados da viagem:', error);
+    } finally {
+        if (debug) console.log('Dados da viagem carregados com sucesso');
+        
+        // Atualiza o total de gastos
+        closeModalLoading();
+
+    }
+}
+
+function closeModalLoading() {
+     
+    const modalElement = document.getElementById('modalLoading');
+    document.activeElement.blur();
+    if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        
+        if (modal) {
+            modal.hide();
+            modalElement.remove();
+        }
+    }
+    // Limpa o modal se ele ainda estiver no DOM
+    const modalLoading = document.getElementById('modalLoading');
+    if (modalLoading) {
+        modalLoading.remove();
+    }
+}
+
 // Elementos do DOM - garantindo que existam
 function getElementOrThrow(id) {
     const element = document.getElementById(id);
@@ -405,6 +552,35 @@ async function uploadDocumento(viagemId, fileInput) {
 }
 
 
+// // Autocomplete para o campo "entidade"
+$(document).ready(function () {
+    $("#entidade").autocomplete({
+        source: function (request, response) {
+            // Faz uma requisição para o backend Flask
+            $.ajax({
+                url: "/api/entidades",
+                data: { q: request.term }, // O texto digitado pelo usuário
+                success: function (data) {
+                    // Formata os resultados para o autocomplete
+                    response(data.map(item => ({
+                        label: item.nome, // Nome exibido
+                        value: item.nome, // Valor no campo
+                        id: item.id      // ID para usar no formulário
+                    })));
+                },
+                error: function () {
+                    console.error("Erro ao buscar entidades.");
+                }
+            });
+        },
+        select: function (event, ui) {
+            // Atualiza o campo oculto com o ID da entidade selecionada
+            $("#entidade-id").val(ui.item.id);
+        }
+    });
+});
+
+
 // Excluir Gastos 
 async function excluirGasto(gastoId) {
     try {
@@ -511,15 +687,6 @@ async function salvarOutros(event) {
 // FUNÇÕES AUXILIARES
 // =============================================
 
-// function showToast(message, type = 'info') {
-//     // Implementação simples de toast
-//     const toast = document.createElement('div');
-//     toast.className = `toast ${type}`;
-//     toast.textContent = message;
-//     document.body.appendChild(toast);
-    
-//     setTimeout(() => toast.remove(), 3000);
-// }
 function createToastContainer() {
     const container = document.createElement('div');
     container.id = 'toastContainer';
@@ -576,8 +743,8 @@ function setupEventListeners() {
     document.getElementById('formOutros').addEventListener('submit', salvarOutros);
     
     // Desabilitar abas secundárias inicialmente
-    document.getElementById('financeiro-tab').setAttribute('disabled', 'disabled');
-    document.getElementById('outros-tab').setAttribute('disabled', 'disabled');
+    // document.getElementById('financeiro-tab').setAttribute('disabled', 'disabled');
+    // document.getElementById('outros-tab').setAttribute('disabled', 'disabled');
 }
 
 // Inicia a aplicação quando o DOM estiver pronto

@@ -61,6 +61,8 @@ async function abrirRelatorioPDF(event) {
 }
 //adicionar o evento de visualizar o modal o modal
 
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const botoesVisualizar = document.querySelectorAll('.visualizar-viagem');
 
