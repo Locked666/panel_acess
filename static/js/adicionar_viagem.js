@@ -52,81 +52,91 @@ function executarTarefa(fnc){
     setTimeout(() => {
         fnc();
         closeModalLoading();
-    }, 2000);
+    }, 1000);
 }
     
 
+// function calcularDiasEDiaria() {
+//     const dataSaida = document.getElementById('dataSaida');
+//     const dataRetorno = document.getElementById('dataRetorno');
+//     const quantidadeDiarias = document.getElementById('quantidadeDiarias');
+//     const valorDiaria = document.getElementById('valorDiaria');
+
+//     if (dataSaida.value && dataRetorno.value) {
+//         const inicio = new Date(dataSaida.value);
+//         const fim = new Date(dataRetorno.value);
+        
+//         // Verifica se a data de retorno é anterior à de saída
+//         if (fim < inicio) {
+//             alert('Data de retorno deve ser posterior à data de saída');
+//             dataRetorno.value = '';
+//             quantidadeDiarias.value = '';
+//             valorDiaria.value = '';
+//             return;
+//         }
+
+//         // Calcula a diferença em dias completos (desconsiderando horários)
+//         const diffDays = Math.floor((fim - inicio) / (1000 * 60 * 60 * 24));
+        
+//         // Verifica horários de saída e retorno
+//         const horaSaida = inicio.getHours() + inicio.getMinutes() / 60;
+//         const horaRetorno = fim.getHours() + fim.getMinutes() / 60;
+        
+//         // Define os limites de horário (7:30 e 17:30 em formato decimal)
+//         const LIMITE_MANHA = 7.5;   // 7:30
+//         const LIMITE_TARDE = 17.5;  // 17:30
+        
+//         // Calcula diárias considerando as regras
+//         let diarias = 0;
+        
+//         // Se for no mesmo dia
+//         if (diffDays === 0) {
+//             // Verifica se saiu antes das 7:30
+//             if (horaSaida < LIMITE_MANHA) {
+//                 diarias = 1;
+//             }
+//             // Verifica se retornou depois das 17:30
+//             else if (horaRetorno > LIMITE_TARDE) {
+//                 diarias = 1;
+//             }
+//             // Se saiu depois das 7:30 e retornou antes das 17:30
+//             else {
+//                 diarias = 0;
+//             }
+//         } 
+//         // Se for em dias diferentes
+//         else {
+//             // Diária do dia de saída (se saiu antes das 7:30)
+//             diarias += horaSaida < LIMITE_MANHA ? 1 : 0;
+            
+//             // Diária do dia de retorno (se retornou depois das 17:30)
+//             diarias += horaRetorno > LIMITE_TARDE ? 1 : 0;
+            
+//             // Dias completos entre saída e retorno (cada dia conta como 1 diária)
+//             diarias += diffDays ;
+//         }
+
+//         // // Garante no mínimo 1 diária se houver qualquer período
+//         // if (diarias === 0 && (inicio.getTime() !== fim.getTime())) {
+//         //     diarias = 1;
+//         // }
+//         console.log('Diárias calculadas:', diarias);
+//         console.log('Diferença de dias',diffDays)
+
+//         quantidadeDiarias.value = diarias;
+//         valorDiaria.value = (diarias * VALOR_DIARIA).toFixed(2);
+//     }
+// }
 function calcularDiasEDiaria() {
-    const dataSaida = document.getElementById('dataSaida');
-    const dataRetorno = document.getElementById('dataRetorno');
     const quantidadeDiarias = document.getElementById('quantidadeDiarias');
     const valorDiaria = document.getElementById('valorDiaria');
-
-    if (dataSaida.value && dataRetorno.value) {
-        const inicio = new Date(dataSaida.value);
-        const fim = new Date(dataRetorno.value);
-        
-        // Verifica se a data de retorno é anterior à de saída
-        if (fim < inicio) {
-            alert('Data de retorno deve ser posterior à data de saída');
-            dataRetorno.value = '';
-            quantidadeDiarias.value = '';
-            valorDiaria.value = '';
-            return;
-        }
-
-        // Calcula a diferença em dias completos (desconsiderando horários)
-        const diffDays = Math.floor((fim - inicio) / (1000 * 60 * 60 * 24));
-        
-        // Verifica horários de saída e retorno
-        const horaSaida = inicio.getHours() + inicio.getMinutes() / 60;
-        const horaRetorno = fim.getHours() + fim.getMinutes() / 60;
-        
-        // Define os limites de horário (7:30 e 17:30 em formato decimal)
-        const LIMITE_MANHA = 7.5;   // 7:30
-        const LIMITE_TARDE = 17.5;  // 17:30
-        
-        // Calcula diárias considerando as regras
-        let diarias = 0;
-        
-        // Se for no mesmo dia
-        if (diffDays === 0) {
-            // Verifica se saiu antes das 7:30
-            if (horaSaida < LIMITE_MANHA) {
-                diarias = 1;
-            }
-            // Verifica se retornou depois das 17:30
-            else if (horaRetorno > LIMITE_TARDE) {
-                diarias = 1;
-            }
-            // Se saiu depois das 7:30 e retornou antes das 17:30
-            else {
-                diarias = 0;
-            }
-        } 
-        // Se for em dias diferentes
-        else {
-            // Diária do dia de saída (se saiu antes das 7:30)
-            diarias += horaSaida < LIMITE_MANHA ? 1 : 0;
-            
-            // Diária do dia de retorno (se retornou depois das 17:30)
-            diarias += horaRetorno > LIMITE_TARDE ? 1 : 0;
-            
-            // Dias completos entre saída e retorno (cada dia conta como 1 diária)
-            diarias += diffDays ;
-        }
-
-        // // Garante no mínimo 1 diária se houver qualquer período
-        // if (diarias === 0 && (inicio.getTime() !== fim.getTime())) {
-        //     diarias = 1;
-        // }
-        console.log('Diárias calculadas:', diarias);
-        console.log('Diferença de dias',diffDays)
-
-        quantidadeDiarias.value = diarias;
+    
+    if (quantidadeDiarias.value) {
+        const diarias = parseInt(quantidadeDiarias.value);
         valorDiaria.value = (diarias * VALOR_DIARIA).toFixed(2);
     }
-}
+}    
+
 /**
  * Salva os dados principais da viagem
  */
@@ -733,8 +743,9 @@ function handleError(message, error) {
 function setupEventListeners() {
     // Dados Principais
     document.getElementById('formDadosPrincipais').addEventListener('submit', salvarDadosPrincipais);
-    document.getElementById('dataSaida').addEventListener('change', calcularDiasEDiaria);
-    document.getElementById('dataRetorno').addEventListener('change', calcularDiasEDiaria);
+    // document.getElementById('dataSaida').addEventListener('change', calcularDiasEDiaria);
+    // document.getElementById('dataRetorno').addEventListener('change', calcularDiasEDiaria);
+    document.getElementById('quantidadeDiarias').addEventListener('change', calcularDiasEDiaria);
     
     // Financeiro
     document.getElementById('formGasto').addEventListener('submit', salvarGasto);
