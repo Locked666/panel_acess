@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, request, redirect, url_for, session,jsonify,send_from_directory,abort, make_response
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import landscape, A4
+from dotenv import load_dotenv
 from reportlab.lib.units import cm
 import io
 # from flask import render_template, request, redirect, url_for, session
@@ -14,14 +15,19 @@ from models import db, Entidade,Log, ConfigAcesso,Usuarios, DocumentosViagens, R
 from config import Config
 from routes.viagens import viagem_bp
 from routes.gastos import gasto_bp
+from routes.auth import auth_bp
 
+load_dotenv(dotenv_path='.env')
 app = Flask(__name__)
 app.secret_key = os.environ.get('APP_SECRET_KEY')
+# print('\napp.secret_key',app.secret_key)
+
 socketio = SocketIO(app)
 app.config.from_object(Config)
     
     # Registrar blueprints
 app.register_blueprint(viagem_bp)
+app.register_blueprint(auth_bp)
 app.register_blueprint(gasto_bp)
 
 
@@ -138,6 +144,14 @@ def gerar_relatorio_pdf(viagens, usuario_nome='', data_inicial=None, data_final=
     return response
 
 
+@app.route('/login', methods=['GET', 'POST'])
+
+def login_admin():
+    if session.get('userAdminConnect'):
+        return render_template('admin_viagens.html')
+    else:
+        return render_template('login.html')
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -170,35 +184,6 @@ def home():
 
     return render_template('index.html', entidades=entidades, qt = qt_inativo  )
 
-# @app.route('/cadastro_acesso', methods=['GET', 'POST'])
-# def cadastro_acesso():
-#     if request.method == 'POST':
-#         entidade_id = request.form.get('entidade-id')
-#         tipo_conexao = request.form.get('tipo_conexao')
-#         id_conexao = request.form.get('id_conexao')
-#         port_conexao = request.form.get('port_conexao')
-#         usuario = request.form.get('usuario')
-#         senha = request.form.get('senha')
-#         ativo = request.form.get('ativo')
-
-#         config_acesso = ConfigAcesso(
-#             entidade=entidade_id,
-#             tipo_conexao=tipo_conexao,
-#             id_conexao=id_conexao,
-#             port_conexao=port_conexao,
-#             usuario=usuario,
-#             senha=senha,
-#             ativo=ativo
-#         )
-#         db.session.add(config_acesso)
-#         db.session.commit()
-
-#         # return redirect(url_for('home'))
-        
-
-#     entidades = Entidade.query.all()
-#     acessos = ConfigAcesso.query.all()
-#     return render_template('cadastro_acesso.html', acessos=acessos, entidades=entidades)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -381,67 +366,6 @@ def get_entidades():
     # Retornar resultado como JSON
     return jsonify(entidades_json)
 
-# @app.route('/api/documentos/<int:documento_id>', methods=['GET'])
-# def visualizar_documento(documento_id):
-#     """
-#     Rota para visualização de documentos
-#     Permite visualizar apenas documentos associados a viagens existentes
-#     """
-#     try:
-#         # Busca o documento no banco de dados
-#         documento = DocumentosViagens.query.get(documento_id)
-#         # Adicione esta validação na rota
-#         if '../' in documento.arquivo or not documento.arquivo.startswith(UPLOAD_FOLDER):
-#             abort(403, description="Acesso não autorizado ao arquivo")
-        
-        
-        
-#         if not documento:
-#             abort(404, description="Documento não encontrado")
-            
-#         # Verifica se o arquivo físico existe
-#         if not os.path.exists(documento.arquivo):
-#             abort(404, description="Arquivo físico não encontrado")
-            
-#         # Extrai informações do arquivo para o cabeçalho
-#         filename = os.path.basename(documento.arquivo)
-#         directory = os.path.dirname(documento.arquivo)
-        
-#         # Configura o tipo de conteúdo apropriado
-#         mimetype = None
-#         if filename.lower().endswith('.pdf'):
-#             mimetype = 'application/pdf'
-#         elif filename.lower().endswith(('.jpg', '.jpeg')):
-#             mimetype = 'image/jpeg'
-#         elif filename.lower().endswith('.png'):
-#             mimetype = 'image/png'
-        
-#         # Envia o arquivo com cabeçalhos seguros
-#         response = send_from_directory(
-#             directory=directory,
-#             path=filename,
-#             mimetype=mimetype,
-#             as_attachment=False,  # True para forçar download
-#             conditional=True      # Suporte a cabeçalhos If-Modified-Since
-#         )
-        
-#         # Adiciona headers de segurança
-#         response.headers['X-Content-Type-Options'] = 'nosniff'
-#         response.headers['Content-Disposition'] = f'inline; filename="{filename}"'
-        
-#         return response
-        
-#     except Exception as e:
-#         abort(500, description=f"Erro ao recuperar documento: {str(e)}")
-
-# @app.route('/api/documentos/download/<int:documento_id>')
-# def download_documento(documento_id):
-#     documento = DocumentosViagens.query.get_or_404(documento_id)
-#     return send_from_directory(
-#         os.path.dirname(documento.arquivo),
-#         os.path.basename(documento.arquivo),
-#         as_attachment=True
-#     )
 
 @app.route('/api/documentos/info/<int:documento_id>', methods=['GET'])
 def get_documento_info(documento_id):
@@ -542,7 +466,12 @@ def update_entidades_api():
 
     return jsonify({'status': 'error', 'message': 'Entidade não encontrada'}), 404
 
-
+@app.route('/admin_viagens', methods=['POST', 'GET'])
+def admin_viagens():
+    if session.get('userAdminConnect'):
+        return render_template('admin_viagens.html')
+    else:
+        return render_template('login.html')
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
@@ -557,57 +486,6 @@ def admin():
 
     entidades = Entidade.query.all()
     return render_template('admin.html', entidades=entidades)
-
-# @app.route('/viagens', methods=['GET', 'POST'])
-# def viagens():
-#     query_usuarios = Usuarios.query.all()
-#     # query_viagens = RegistroViagens.query.all()
-#     if request.method == 'GET': 
-#         if 'usuarioConnect' not in session:
-#             return render_template('setUser.html',users=query_usuarios)
-#         else :
-#             query_viagens = RegistroViagens.query.filter(RegistroViagens.usuario == session['usuarioConnect']).all()
-#             query_entidades = Entidade.query.filter(Entidade.id == RegistroViagens.entidade_destino).all()
-#             query_usuarios_nome = Usuarios.query.filter(Usuarios.id == session['usuarioConnect']).first()
-
-#             # Formate a data de cada entidade antes de passar ao template
-#             for viagem in query_viagens:
-                
-#                 if viagem.usuario:
-#                     usuario = Usuarios.query.get(viagem.usuario)
-#                     if usuario:
-#                         viagem.usuario_nome = usuario.usuario
-#                     else:
-#                         viagem.usuario_nome = 'Usuário não encontrado'
-                
-#                 if viagem.entidade_destino:
-#                     entidade = Entidade.query.get(viagem.entidade_destino)
-#                     if entidade:
-#                         viagem.entidade_nome = entidade.nome
-#                     else:
-#                         viagem.entidade_nome = 'Entidade não encontrada'
-                
-#                 if viagem.data_inicio:  # Verifique se a data existe para evitar erros
-#                     viagem.data_formatada = viagem.data_inicio.strftime('%d/%m/%Y %H:%M:%S')
-#                 else:
-#                     viagem.data_formatada = 'Data não disponível'
-                    
-#                 if viagem.data_fim:  # Verifique se a data existe para evitar erros
-#                     viagem.data_final_formatada = viagem.data_fim.strftime('%d/%m/%Y %H:%M:%S')
-#                 else:
-#                     viagem.data_final_formatada = 'Data não disponível'    
-            
-#             return render_template('registro_viagens.html',viagens = query_viagens, usuario = query_usuarios_nome, entidades=query_entidades)
-            
-#     if request.method == 'POST':
-#         # Captura os dados do formulário
-#         if 'usuarioConnect' in request.form:
-#             session['usuarioConnect'] = request.form['usuarioConnect']
-#             # print(session['usuarioConnect'])
-#             return redirect(url_for('viagens'))
-#         else :
-#             return render_template('registro_viagens.html')
-#     # Aqui você pode adicionar lógica para lidar com o envio de dados
 
 
 @app.route('/viagens', methods=['GET', 'POST'])

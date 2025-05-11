@@ -21,6 +21,16 @@ def validar_dados_viagem(dados):
     # except ValueError as e:
     #     raise APIError('Formato de data inválido. Use o formato YYYY-MM-DDTHH:MM', 400)
 
+def validar_dados_usuario(dados):
+    required = ['usuario']
+    for field in required:
+        if not dados.get(field):
+            raise APIError(f'Campo obrigatório faltando: {field}', 400)
+    
+    if len(dados['senha']) < 6:
+        raise APIError('A senha deve ter pelo menos 6 caracteres', 400)
+
+
 def validar_dados_gasto(dados):
     required = ['viagemId', 'tipoGasto', 'valor']
     print(dados)
