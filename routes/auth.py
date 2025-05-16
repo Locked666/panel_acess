@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify,session
 from utils.exceptions import APIError
 from services.auth_services import (criar_usuario, 
+                                    consultar_usuario,
                                     login_usuario, 
                                     listar_usuarios, 
                                     excluir_usuario)
@@ -13,7 +14,12 @@ def login():
     try:
         data = request.get_json()
         login_usuario()
-        session['userAdminConnect'] = 1
+        u = consultar_usuario(data['username'])
+        session['userAdminConnect'] = u['id']
+        session['usuarioConnect'] = u['id']
+        session['username'] = u['usuario']
+        
+        
         return jsonify({'status':'true'}), 200
         #return login_usuario()
     except APIError as e:

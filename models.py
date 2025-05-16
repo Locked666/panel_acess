@@ -125,7 +125,7 @@ class Usuarios(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     usuario = db.Column(db.String(100), nullable=False)
-    senha = db.Column(db.String(100), nullable=True)
+    senha = db.Column(db.String(1000), nullable=True)
     acesso = db.Column(db.String(100))
     admin = db.Column(db.Boolean, default=False)
     data = db.Column(db.DateTime, default=db.func.now())

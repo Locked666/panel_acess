@@ -87,7 +87,7 @@ loginButton.addEventListener("click", async function (event) {
             window.location.href = "/admin_viagens"; // Redirect to the dashboard on successful login
         } else {
             const errorText = await response.json();
-            console.log(`Login failed: ${errorText}`); // Display error message
+            console.log(`Login failed: ${errorText.message}`); // Display error message
         }
     } catch (error) {
         console.error("Error during login:", error);

@@ -12,14 +12,21 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import BadRequest
 from functions import encrypt,decrypt
 from models import db, Entidade,Log, ConfigAcesso,Usuarios, DocumentosViagens, RegistroViagens#, GastosViagens, DocumentosViagens
+from flask_jwt_extended import JWTManager, create_access_token
 from config import Config
 from routes.viagens import viagem_bp
 from routes.gastos import gasto_bp
 from routes.auth import auth_bp
+from routes.dashboard import dashboard_bp
 
 load_dotenv(dotenv_path='.env')
 app = Flask(__name__)
 app.secret_key = os.environ.get('APP_SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.environ.get('APP_SECRET_KEY')
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
+
+
+jwt = JWTManager(app)
 # print('\napp.secret_key',app.secret_key)
 
 socketio = SocketIO(app)
@@ -29,6 +36,7 @@ app.config.from_object(Config)
 app.register_blueprint(viagem_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(gasto_bp)
+app.register_blueprint(dashboard_bp)
 
 
 # Definindo o caminho absoluto para o banco de dados
@@ -148,7 +156,7 @@ def gerar_relatorio_pdf(viagens, usuario_nome='', data_inicial=None, data_final=
 
 def login_admin():
     if session.get('userAdminConnect'):
-        return render_template('admin_viagens.html')
+        return redirect (url_for('admin_viagens'))  # Redireciona se já estiver logado
     else:
         return render_template('login.html')
 
@@ -469,7 +477,7 @@ def update_entidades_api():
 @app.route('/admin_viagens', methods=['POST', 'GET'])
 def admin_viagens():
     if session.get('userAdminConnect'):
-        return render_template('admin_viagens.html')
+        return render_template('adminPanel/admin_viagens.html')
     else:
         return render_template('login.html')
 
@@ -611,6 +619,7 @@ def adicionar_viagem():
 def logout():
     session.pop('usuarioConnect', None)
     session.pop('username', None)
+    session.pop('userAdminConnect', None)
     return redirect(url_for('home'))
 
 @app.route('/log', methods=['GET', 'POST'])
