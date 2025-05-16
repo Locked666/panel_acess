@@ -7,8 +7,8 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/api/dashboard')
 
 
 
-@dashboard_bp.route('/gastos', methods=['GET'])
-def gastos():
+@dashboard_bp.route('/', methods=['GET'])
+def dashboar_data():
     if session.get('userAdminConnect') is None:
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
     
