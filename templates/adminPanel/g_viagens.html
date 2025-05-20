@@ -1,0 +1,44 @@
+<!--Gestor de Viagens -->
+
+{% extends "layouts/base.html" %}
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block title %} Gestor de Viagens {% endblock %} 
+
+{% block content %}
+<div class="container">
+    <h1>Gestor de Viagens</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Lista de Viagens</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Destino</th>
+                        <th>Data de Partida</th>
+                        <th>Data de Chegada</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for viagem in viagens %}
+                    <tr>
+                        <td>{{ viagem.id }}</td>
+                        <td>{{ viagem.destino }}</td>
+                        <td>{{ viagem.data_partida }}</td>
+                        <td>{{ viagem.data_chegada }}</td>
+                        <td><a href="" class="btn btn-primary">Editar</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Adicionar nova viagem -->
+            <a href="" class="btn btn-success">Adicionar Nova Viagem</a>
+
+        </div>
+    </div>
+
+{%endblock content%}

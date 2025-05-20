@@ -7,6 +7,7 @@ from reportlab.lib.units import cm
 import io
 # from flask import render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, emit
+from jinja2 import TemplateNotFound
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import BadRequest
@@ -474,12 +475,47 @@ def update_entidades_api():
 
     return jsonify({'status': 'error', 'message': 'Entidade não encontrada'}), 404
 
-@app.route('/admin_viagens', methods=['POST', 'GET'])
+@app.route('/admin_viagens')
 def admin_viagens():
     if session.get('userAdminConnect'):
-        return render_template('adminPanel/admin_viagens.html')
+        return render_template('adminPanel/admin_viagens.html',segment='dashboard')
     else:
         return render_template('login.html')
+    
+@app.route('/<template>')
+def route_template(template):
+    try:
+
+        if not template.endswith('.html'):
+            template += '.html'
+
+        # Detect the current page
+        segment = get_segment(request)
+
+        # Serve the file (if exists) from app/templates/home/FILE.html
+        return render_template("adminPanel/" + template, segment=segment)
+
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404
+
+    except Exception as e:
+        print("\nErro ao renderizar o template:", e)
+        
+        return render_template('page-500.html'), 500
+
+def get_segment(request):
+
+    try:
+
+        segment = request.path.split('/')[-1]
+
+        if segment == '':
+            segment = 'admin_viagens'
+
+        return segment
+
+    except:
+        return None
 
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
