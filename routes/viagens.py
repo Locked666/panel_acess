@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify,session
-from services.viagem_service import criar_viagem, listar_cidades, update_viagem,consultar_viagens
+from services.viagem_service import criar_viagem, listar_cidades, update_viagem,consultar_viagens,listar_viagens
 from utils.exceptions import APIError
 
 viagem_bp = Blueprint('viagens', __name__, url_prefix='/api/viagens')
@@ -59,7 +59,7 @@ def criar():
         # id_viagem =request.args.get('viagemId', '') 
         # print(f"Dados recebidos: {request.args.__dict__}")
         
-        if user != data['usuario']:
+        if int(user) != int(data['usuario']):   
             raise APIError('Usuário não autorizado', 403)
         
         if data.get('viagemId'):
@@ -83,6 +83,30 @@ def criar():
         return jsonify({'status': 'error', 'message': str(e)}), e.code
     except Exception as e:
         return jsonify({'status': 'error', 'message': 'Erro interno', 'exception': e}), 500
+
+
+@viagem_bp.route('/consultaViagens', methods=['GET'])
+def consulta_viagens():
+    try:
+        if session.get('userAdminConnect') is None:
+            return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+        
+        viagens = listar_viagens()
+        return jsonify([{
+            'id': c.id,
+            'entidade': c.entidade_nome,
+            'entidade_id': c.entidade_destino,
+            'data_inicio': c.data_inicio,
+            'data_fim': c.data_fim,
+            'tipo_viagem': c.tipo_viagem,
+            'n_diarias': int(c.n_diaria),
+            'valor_diaria': float(c.v_diaria),
+            'descricao': c.descricao,
+            'n_intranet': c.n_intranet,
+            'total_gasto': c.total_gasto
+        } for c in viagens])
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @viagem_bp.route('/cidades', methods=['GET'])
 def cidades():

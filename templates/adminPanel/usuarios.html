@@ -51,13 +51,14 @@
                 <div class="card-body px-0 pb-2">
                   <div class="table-responsive p-0">
                     <table class="table align-items-center mb-0">
+                      <!--Cabeçalho da tabela-->
                       <thead>
                         <tr>
                           <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Usuário</th>
                           <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Função</th>
                           <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
                           <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Adicionado</th>
-                          <th class="text-secondary opacity-7">Ação</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ação</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -283,3 +284,10 @@
 
 
 {% endblock content %}
+
+{% block javascripts %}
+  <script src="{{ url_for('static', filename='js/adminUsuarios.js')}}"></script>
+
+  <script src="/static/assets/js/plugins/chartjs.min.js"></script>
+
+{% endblock javascripts %}

@@ -16,10 +16,11 @@ const dashboardTotalDiarias30diasValue = document.getElementById("total-diarias-
 async function getDashboardTotalGasto30Dias() {
     const response = await fetch("/api/dashboard");
     const data = await response.json();
-
+    
+    // testar aguardar 10 segundos
     if (response.ok) {
         dashboardTotalGasto30DiasValue.innerText = `R$ ${data.gastos_ultimos_30_dias.toFixed(2)}`;
-        dashboardTotalGasto30DiasPercent.innerText = `${0} %`;
+        dashboardTotalGasto30DiasPercent.innerText = `${10}% `;
         dashboardTotalViagens30diasValue.innerText = `${data.viagens_ultimos_30_dias} viagens`;
         dashboardTotalDiariasDias30diasValue.innerText = `${data.diarias_ultimos_30_dias} diárias`;
         dashboardTotalDiarias30diasValue.innerText = `R$ ${data.valor_diarias_ultimos_30_dias.toFixed(2)}`;
@@ -284,7 +285,9 @@ async function getDashboardRows() {
 
 
 async function init() {
+    await new Promise(resolve => setTimeout(resolve, 100));
     await getDashboardTotalGasto30Dias();
+    await new Promise(resolve => setTimeout(resolve, 300));
     await getDashboardRows();
 }
 

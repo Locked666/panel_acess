@@ -1,44 +1,140 @@
-<!--Gestor de Viagens -->
-
 {% extends "layouts/base.html" %}
+
+{% block title %}Gestão de Viagens{% endblock %}
 
 {% block stylesheets %}{% endblock stylesheets %}
 
-{% block title %} Gestor de Viagens {% endblock %} 
-
 {% block content %}
-<div class="container">
-    <h1>Gestor de Viagens</h1>
-    <div class="row">
-        <div class="col-md-12">
-            <h2>Lista de Viagens</h2>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Destino</th>
-                        <th>Data de Partida</th>
-                        <th>Data de Chegada</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for viagem in viagens %}
-                    <tr>
-                        <td>{{ viagem.id }}</td>
-                        <td>{{ viagem.destino }}</td>
-                        <td>{{ viagem.data_partida }}</td>
-                        <td>{{ viagem.data_chegada }}</td>
-                        <td><a href="" class="btn btn-primary">Editar</a></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <!-- Adicionar nova viagem -->
-            <a href="" class="btn btn-success">Adicionar Nova Viagem</a>
-
-        </div>
+<div class="container-fluid py-4">
+  
+  <!-- Filtros -->
+  <div class="card mb-4">
+    <div class="card-header pb-0">
+      <h6>Filtros de Viagens</h6>
     </div>
+    <div class="card-body">
+      <form id="form-filtros" class="row g-3">
+        <div class="col-md-2">
+          <label for="data_inicio" class="form-label">Data Início</label>
+          <input type="date" class="form-control" id="data_inicio">
+        </div>
+        <div class="col-md-2">
+          <label for="data_fim" class="form-label">Data Fim</label>
+          <input type="date" class="form-control" id="data_fim">
+        </div>
+        <div class="col-md-2">
+          <label for="entidade" class="form-label">Entidade</label>
+          <input type="text" class="form-control" id="entidade">
+        </div>
+        <div class="col-md-1">
+          <label for="id_viagem" class="form-label">ID</label>
+          <input type="text" class="form-control" id="id_viagem">
+        </div>
+        <div class="col-md-2">
+          <label for="relatorio" class="form-label">Relatório</label>
+          <input type="text" class="form-control" id="relatorio">
+        </div>
+        <div class="col-md-2">
+          <label for="usuario" class="form-label">Usuário</label>
+          <select class="form-select" id="usuario">
+            <option value="">Todos</option>
+            <!-- Opções serão adicionadas via JS/API -->
+          </select>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="button" class="btn btn-primary w-100" id="btn-filtrar">Filtrar</button>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="button" class="btn btn-secondary w-100" id="btn-limpar">Limpar</button>
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#modalViagem">Adicionar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-{%endblock content%}
+  <!-- Tabela -->
+  <div class="card">
+    <div class="card-header pb-0">
+      <h6>Lista de Viagens</h6>
+    </div>
+    <div class="card-body px-0 pt-0 pb-2">
+      <div class="table-responsive p-3">
+        <table class="table align-items-center mb-0">
+          <thead>
+            <tr>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Código</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Usuário</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entidade</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Data Início</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Data Fim</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Gasto</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-viagens">
+            <!-- Dados via JS/API -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginação -->
+      <nav aria-label="Page navigation" class="mx-4">
+        <ul class="pagination justify-content-end" id="paginacao-viagens">
+          <!-- Páginas adicionadas via JS/API -->
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Adição/Edição de Viagem -->
+<div class="modal fade" id="modalViagem" tabindex="-1" aria-labelledby="modalViagemLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalViagemLabel">Adicionar/Editar Viagem</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-viagem">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="modal-usuario" class="form-label">Usuário</label>
+              <select class="form-select" id="modal-usuario">
+                <!-- Opções via JS/API -->
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="modal-entidade" class="form-label">Entidade</label>
+              <input type="text" class="form-control" id="modal-entidade">
+            </div>
+            <div class="col-md-4">
+              <label for="modal-relatorio" class="form-label">Relatório</label>
+              <input type="text" class="form-control" id="modal-relatorio">
+            </div>
+            <div class="col-md-3">
+              <label for="modal-data-inicio" class="form-label">Data Início</label>
+              <input type="date" class="form-control" id="modal-data-inicio">
+            </div>
+            <div class="col-md-3">
+              <label for="modal-data-fim" class="form-label">Data Fim</label>
+              <input type="date" class="form-control" id="modal-data-fim">
+            </div>
+            <div class="col-md-3">
+              <label for="modal-total-gasto" class="form-label">Total Gasto</label>
+              <input type="text" class="form-control" id="modal-total-gasto">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btn-salvar-viagem">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

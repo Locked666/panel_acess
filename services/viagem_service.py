@@ -97,5 +97,18 @@ def consultar_viagens(viagemid):
     return query
 
 
+def listar_viagens():
+    viagens = RegistroViagens.query.filter_by(ativo=True).all()
+    for viagem in viagens:
+        if viagem.entidade_destino:
+            viagem.entidade_nome = Entidade.query.get(viagem.entidade_destino).nome
+        if viagem.usuario:
+            viagem.usuario_nome = Usuarios.query.get(viagem.usuario).usuario
+        if viagem.data_inicio:
+            viagem.data_inicio = viagem.data_inicio.strftime('%d/%m/%Y %H:%M') #('%Y-%m-%d %H:%M')
+        if viagem.data_fim:
+            viagem.data_fim = viagem.data_fim.strftime('%d/%m/%Y %H:%M')
+    return viagens
+
 def listar_cidades():
     return Entidade.query.filter_by(ativo=True).all()
