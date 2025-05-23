@@ -22,6 +22,25 @@ def consultar_usuario(username):
         return print(f"\nerro a consultar usuario: {e}\n")
     
 
+def update_viagem(usuario_id, dados):
+    usuario = Usuarios.query.get(usuario_id)
+    if not usuario:
+        raise APIError('Usuário não encontrado', 404)
+    # Atualiza os dados do usuário
+    usuario.usuario = dados['usuario']
+    usuario.admin = True if  dados['admin'] == 'true' else False,
+    usuario.acesso = dados.get('acesso')
+    usuario.senha = generate_password_hash(dados['senha'], method='pbkdf2:sha256')
+    usuario.ativo = dados['ativo']
+    usuario.diaria = True if  dados.get('diaria') == 'true' else False,
+    usuario.email = dados.get('email')
+    usuario.foto = dados.get('foto')
+    usuario.setor = dados.get('setor')
+    
+    # Salva as alterações no banco de dados
+    db.session.commit()
+    return usuario
+
 def criar_usuario():
     dados = request.get_json()
     validar_dados_usuario(dados)
@@ -33,15 +52,23 @@ def criar_usuario():
 
     # Cria um novo usuário
     novo_usuario = Usuarios(
-        usuario=dados['nome'],
-        admin= True if  dados['admin'] == 'true' else False,
-        acesso=dados['acesso'],
+        usuario=dados['usuario'],
+        admin= True if  dados['admin'] == 'on' else False,
+        acesso=dados.get('acesso'),
+        email=dados.get('email'),
+        foto=dados.get('foto'),
+        setor=dados.get('setor'),
+        ativo=True if  dados['ativo'] == 'on' else False,
+        diaria=True if  dados.get('diaria') == 'on' else False,
+        
+        
+        
         senha=generate_password_hash(dados['senha'], method='pbkdf2:sha256')
     )
     db.session.add(novo_usuario)
     db.session.commit()
 
-    return jsonify({'message': 'Usuário criado com sucesso!'}), 201
+    return novo_usuario.id
 
 def login_usuario():
     dados = request.get_json()
@@ -49,7 +76,7 @@ def login_usuario():
     usuario = Usuarios.query.filter_by(usuario=dados['username']).first()
     
     if not usuario or not usuario.admin or not usuario.ativo:
-        raise APIError('Usuário não autorizado ou inativo', 403)
+        raise APIError('Usuário ou senha inválidos', 403)
 
     if not usuario or not check_password_hash(usuario.senha, dados['password']):
         raise APIError('Usuário ou senha inválidos', 401)
@@ -68,10 +95,16 @@ def listar_usuarios():
             'id': usuario.id,
             'usuario': usuario.usuario,
             'acesso': usuario.acesso,
-            'admin': usuario.admin
+            'admin': usuario.admin,
+            'diaria': usuario.diaria,
+            'email': usuario.email,
+            'setor': usuario.setor,
+            'foto': usuario.foto,
+            'ativo': usuario.ativo,
+            'data': usuario.data.strftime('%Y-%m-%d') if usuario.data else None,
         })
 
-    return jsonify(usuarios_list), 200
+    return usuarios_list
 
 def excluir_usuario(usuario_id):
     usuario = Usuarios.query.get(usuario_id)

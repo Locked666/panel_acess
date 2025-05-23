@@ -536,7 +536,13 @@ def admin():
 def viagens():
     data_inicio = None
     data_fim = None
-    query_usuarios = Usuarios.query.all()
+    # query_usuarios = Usuarios.query.all()
+    # query_usuarios.filter(Usuarios.ativo == True).all()
+    query_usuarios = Usuarios.query.filter_by(
+            ativo=True,
+            diaria=True
+            
+        ).all()
 
     # POST: define usuário na sessão
     if request.method == 'POST':

@@ -88,12 +88,75 @@ loginButton.addEventListener("click", async function (event) {
         } else {
             const errorText = await response.json();
             console.log(`Login failed: ${errorText.message}`); // Display error message
+            exibirToast(
+                {
+                    tipo: "danger",
+                    mensagem: `Login falhou: ${errorText.message}`,
+                    position: 'top',
+                    tempo: 4000
+                }
+            )
         }
     } catch (error) {
         console.error("Error during login:", error);
         alert("An error occurred. Please try again later.");
     }
 
+
+    function exibirToast({ tipo = "info", mensagem = "Mensagem padrão",position = 'bottom' ,tempo = 4000 }) {
+        const icones = {
+            success: "check",
+            info: "notifications",
+            warning: "travel_explore",
+            danger: "campaign"
+        };
+    
+        const classes = {
+            success: "bg-white text-success",
+            info: "bg-gradient-info text-white",
+            warning: "bg-white text-warning",
+            danger: "bg-white text-danger"
+        };
+    
+        const toastContainerId = "toast-container";
+        let container = document.getElementById(toastContainerId);
+    
+        if (!container) {
+            container = document.createElement("div");
+            container.id = toastContainerId;
+            container.className = `position-fixed ${position}-1 end-1 z-index-2`;
+            document.body.appendChild(container);
+        }
+    
+        const toast = document.createElement("div");
+        toast.className = `toast fade show p-2 mt-2 ${classes[tipo] || "bg-white"}`;
+        toast.setAttribute("role", "alert");
+        toast.setAttribute("aria-live", "assertive");
+        toast.setAttribute("aria-atomic", "true");
+    
+        toast.innerHTML = `
+            <div class="toast-header ${tipo === 'info' ? 'bg-transparent' : 'border-0'}">
+                <i class="material-icons me-2">${icones[tipo] || "notifications"}</i>
+                <span class="me-auto font-weight-bold ${tipo === 'danger' ? 'text-danger' : ''}">Sistema</span>
+                <small class="${tipo === 'info' ? 'text-white' : 'text-body'}">agora</small>
+                <i class="fas fa-times text-md ms-3 cursor-pointer ${tipo === 'info' ? 'text-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></i>
+            </div>
+            <hr class="horizontal ${tipo === 'info' ? 'light' : 'dark'} m-0">
+            <div class="toast-body ${tipo === 'info' ? 'text-white' : ''}">
+                ${mensagem}
+            </div>
+        `;
+    
+        container.appendChild(toast);
+    
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+    
+        setTimeout(() => {
+            bsToast.hide();
+            toast.addEventListener('hidden.bs.toast', () => toast.remove());
+        }, tempo);
+    }
     
 
     // try {

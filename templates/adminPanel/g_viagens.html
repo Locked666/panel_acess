@@ -35,8 +35,8 @@
           <input type="text" class="form-control" id="relatorio">
         </div>
         <div class="col-md-2">
-          <label for="usuario" class="form-label">Usuário</label>
-          <select class="form-select" id="usuario">
+          <label for="filterUsuario" class="form-label">Usuário</label>
+          <select class="form-select" id="filterUsuario">
             <option value="">Todos</option>
             <!-- Opções serão adicionadas via JS/API -->
           </select>
@@ -56,8 +56,8 @@
 
   <!-- Tabela -->
   <div class="card">
-    <div class="card-header pb-0">
-      <h6>Lista de Viagens</h6>
+    <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+        <h6 class="text-white text-capitalize ps-3">Lista de Viagens</h6>
     </div>
     <div class="card-body px-0 pt-0 pb-2">
       <div class="table-responsive p-3">
@@ -69,6 +69,8 @@
               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entidade</th>
               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Data Início</th>
               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Data Fim</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Qt Diarias</th>
+              <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Relatório</th>
               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total Gasto</th>
               <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Ações</th>
             </tr>
@@ -138,3 +140,6 @@
 </div>
 
 {% endblock content %}
+{% block javascripts %}
+  <script src="{{ url_for('static', filename='js/gViagens.js')}}"></script>
+{% endblock javascripts %}

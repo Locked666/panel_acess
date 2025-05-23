@@ -127,9 +127,14 @@ class Usuarios(db.Model):
     usuario = db.Column(db.String(100), nullable=False)
     senha = db.Column(db.String(1000), nullable=True)
     acesso = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    foto = db.Column(db.String(1000), comment='Caminho da foto do usuário')
+    setor = db.Column(db.String(100))
     admin = db.Column(db.Boolean, default=False)
-    data = db.Column(db.DateTime, default=db.func.now())
+    diaria = db.Column(db.Boolean, default=True)
     ativo = db.Column(db.Boolean, default=True)
+    data = db.Column(db.DateTime, default=db.func.now())
+    
 
 
 
