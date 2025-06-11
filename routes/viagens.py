@@ -123,6 +123,37 @@ def consulta_viagens():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
+@viagem_bp.route('/relatorio/viagens', methods=['GET'])
+def relatorio_viagens():
+    try:
+        if session.get('userAdminConnect') is None:
+            return jsonify({'status': 'error', 'message': 'Unauthorized'}), 401
+        
+        viagens = listar_viagens()
+        
+        if not viagens:
+            return jsonify({'status': 'ok', 'message': 'No data found'}), 404
+        
+        relatorio = [{
+            'id': c.id,
+            'tecnico': c.usuario_nome,
+            'entidade': c.entidade_nome,
+            'entidade_id': c.entidade_destino,
+            'data_inicio': c.data_inicio,
+            'data_fim': c.data_fim,
+            'tipo_viagem': c.tipo_viagem,
+            'n_diarias': int(c.n_diaria),
+            'valor_diaria': float(c.v_diaria),
+            'descricao': c.descricao,
+            'n_intranet': c.n_intranet,
+            'total_gasto': c.total_gasto
+        } for c in viagens]
+        
+        return jsonify(relatorio), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @viagem_bp.route('/cidades', methods=['GET'])
 def cidades():
     try:
