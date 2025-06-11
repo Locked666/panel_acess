@@ -95,14 +95,15 @@ async function atualizarTabelaUsuarios(data) {
 
 async function gravarUsuario() {
     const url = "/api/auth/criar";
+    const modal = document.querySelector(".modal.show");
     const bodyPayLoad = {
         usuario: document.getElementById("nomeUsuario").value,
         email: document.getElementById("emailUsuario").value,
         senha: document.getElementById("senhaUsuario").value,
-        admin: document.getElementById("usuarioAdmin").value,
-        ativo: document.getElementById("usuarioAtivo").value,
+        admin: document.getElementById("usuarioAdmin").checked,
+        ativo: document.getElementById("usuarioAtivo").checked,
         setor: document.getElementById("setorUsuario").value,
-        diaria: document.getElementById("usuarioDiaria").value,
+        diaria: document.getElementById("usuarioDiaria").checked,
     };
 
     console.log("bodyPayLoad", bodyPayLoad);
@@ -116,6 +117,10 @@ async function gravarUsuario() {
     const data = await response.json();
     if (response.ok) {
         console.log("Dados gravados:", data);
+        if (modal) {
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+        }
         exibirToast({
             tipo: "success",
             mensagem: "Usuário gravado com sucesso!",
@@ -125,6 +130,11 @@ async function gravarUsuario() {
         buscarUsuarios();
     } else {
         console.error("Erro ao gravar dados:", data);
+        
+        if (modal) {
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+        }
         exibirToast({
             tipo: "danger",
             mensagem: data.message || "Erro ao gravar usuário.",

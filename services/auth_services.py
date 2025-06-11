@@ -47,19 +47,23 @@ def criar_usuario():
 
     # Verifica se o usuário já existe
     usuario_existente = Usuarios.query.filter_by(usuario=dados['usuario']).first()
+    usuario_existente_email = Usuarios.query.filter_by(email=dados['email']).first()
     if usuario_existente:
         raise APIError('Usuário já existe', 400)
+    
+    if usuario_existente_email:
+        raise APIError('Email já cadastrado', 400)
 
     # Cria um novo usuário
     novo_usuario = Usuarios(
         usuario=dados['usuario'],
-        admin= True if  dados['admin'] == 'on' else False,
+        admin= True if  dados['admin'] == True else False,
         acesso=dados.get('acesso'),
         email=dados.get('email'),
         foto=dados.get('foto'),
         setor=dados.get('setor'),
-        ativo=True if  dados['ativo'] == 'on' else False,
-        diaria=True if  dados.get('diaria') == 'on' else False,
+        ativo=True if  dados['ativo'] == True else False,
+        diaria=True if  dados.get('diaria') == True else False,
         
         
         
