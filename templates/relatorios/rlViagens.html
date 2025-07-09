@@ -30,6 +30,9 @@
             border-collapse: collapse;
             margin-bottom: 60px;
         }
+        thead {
+            background-color:rgb(49, 96, 250);
+        }
 
         th, td {
             border: 1px solid #000;
@@ -80,11 +83,14 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Destino</th>
-                <th>Data Início</th>
+                <th>Código</th>
+                <th>Usuário</th>
+                <th>Entidade</th>
+                <th>Data Inicio</th>
                 <th>Data Fim</th>
-                <th>Descrição</th>
+                <th>QT Diárias</th>
+                <th>Relatório</th>
+                <th>Total Gasto</th>
             </tr>
         </thead>
         <tbody>
@@ -95,9 +101,25 @@
                 <td>{{ viagem.data_inicio.strftime('%d/%m/%Y') }}</td>
                 <td>{{ viagem.data_fim.strftime('%d/%m/%Y') }}</td>
                 <td>{{ viagem.descricao }}</td>
+                <td>{{ viagem.data_fim.strftime('%d/%m/%Y') }}</td>
+                <td>{{ viagem.descricao }}</td>
+                <td>{{ viagem.data_fim.strftime('%d/%m/%Y') }}</td>
+                
             </tr>
             {% endfor %}
         </tbody>
+        <tfoot>
+            <tr>
+              <th scope="row">Total</th>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>0</td>
+              <td>21,000</td>
+            </tr>
+        </tfoot>
     </table>
 
     <div class="assinatura">
