@@ -73,29 +73,29 @@ Contribuições são bem-vindas! Siga os passos abaixo para contribuir:
 ## Tela de Login. 
 * Adicionado tela de Login com validação de credencias.
 
-![Imagem Tela de Login com Validação](img_md\img_validacao.png)
+![Imagem Tela de Login com Validação](.\img_md\img_validacao.png)
 
 ## Tela de Home. 
 * Tela Home, com Dashboards e Cards com informações pricipais. 
 * Adicionado SidBar Lateral. 
 
-![Imagem Tela de Home](img_md\img_home.png)
+![Imagem Tela de Home](.\.\img_md\img_home.png)
 
 ## Telas de Cadastros. 
 
 * Tela de Cadastros de Usuários e Viagens com Filtros e Crud Completo.
 * Adicionado Validação de Busca de dados.  
 
-![Imagem Tela de Usuários](img_md\img_users.png)  ![Imagem Tela de Viagens](img_md\img_viagens.png)
+![Imagem Tela de Usuários](.\.\img_md\img_users.png)  ![Imagem Tela de Viagens](.\.\img_md\img_viagens.png)
 
 
 ## Telas de Usuaios Comuns. 
 
 * Adicionado tela de Cadastro de Viagens, com possibilidade de adicionar Gastos com imagens e calculo dinamico de valor realizado pelo backend. 
 
-![Imagem de tela de cadastro de viagens](img_md\img_cadastro.png)
+![Imagem de tela de cadastro de viagens](.\.\img_md\img_cadastro.png)
 
-![Imagem de tela de cadastro de gasto](img_md\img_add_gastos.png)
+![Imagem de tela de cadastro de gasto](.\.\img_md\img_add_gastos.png)
 
 ## 💥 Extras: 
 
